@@ -15,7 +15,7 @@ const {
 const { auth } = require("../middleware/auth.middleware");
 
 const router = new Router({
-  prefix: "/admins",
+  prefix: "/api/admins",
 });
 
 // 注册接口

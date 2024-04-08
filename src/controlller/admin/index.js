@@ -25,10 +25,18 @@ class AdminController {
     try {
       const { password, account, ...rest } = admin;
 
-      ctx.cookies.set("username", encodeURIComponent(`${account}`));
+      ctx.cookies.set("username", encodeURIComponent(`${account}`), {
+        sameSite: "strict",
+      });
       ctx.cookies.set(
         "token",
-        encodeURIComponent(`${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`)
+        encodeURIComponent(
+          `${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`
+        ),
+        {
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          sameSite: "strict",
+        }
       );
 
       commonResult(ctx, {

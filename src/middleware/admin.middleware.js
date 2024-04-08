@@ -20,6 +20,7 @@ const adminValidator = async (ctx, next) => {
 
 const verifyAdmin = async (ctx, next) => {
   const { username } = ctx.request.body;
+
   const hasAdmin = await queryAdmin(username);
 
   if (hasAdmin && hasAdmin.length) {
@@ -76,6 +77,7 @@ const cryptPassword = async (ctx, next) => {
   // hash保存的是加密后的password
   let hash = bcryptjs.hashSync(password, salt);
   ctx.request.body.password = hash;
+
   await next();
 };
 

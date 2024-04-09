@@ -66,11 +66,6 @@ class AdminController {
           status: 200,
           message: "密码已更新",
         });
-      } else {
-        commonResult(ctx, {
-          status: 500,
-          message: "密码未更新成功，请检查服务器问题",
-        });
       }
     } catch (err) {
       commonResult(ctx, {

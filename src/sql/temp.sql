@@ -20,6 +20,7 @@ create table student
     stu_name     varchar(50)                       not null comment '学生姓名',
     id_card      varchar(20)                       null comment '身份证号',
     status       int                               not null default 1 comment '1 有效 99 删除',
+    sex          int                               not null default 1 comment '1 男 2 女',
     create_ts    timestamp                         not null default current_timestamp,
     update_ts    timestamp                         not null default current_timestamp on update current_timestamp,
     index idx_stu_name (stu_name),

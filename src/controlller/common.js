@@ -20,6 +20,13 @@ const commonResult = (ctx, { data = null, message, status }) => {
   ctx.toJSON();
 };
 
+const commonServerWrongResult = (ctx, message) =>
+  commonResult(ctx, {
+    status: 500,
+    message: message,
+  });
+
 module.exports = {
   commonResult,
+  commonServerWrongResult,
 };

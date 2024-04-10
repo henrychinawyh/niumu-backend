@@ -5,6 +5,7 @@ const {
   editStudent,
   deleteStudent,
   getStudent,
+  exportStudent,
 } = require("../controlller/student");
 
 const router = new Router({
@@ -25,5 +26,8 @@ router.post("/deleteStudent", deleteStudent);
 
 // 获取单个学员
 router.post("/getStudent", getStudent);
+
+// 导出学生表
+router.post("/exportStudent", exportStudent);
 
 module.exports = router;

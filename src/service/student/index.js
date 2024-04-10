@@ -6,7 +6,6 @@ const queryStudent = async (data) => {
   const { current = 1, pageSize = 10 } = data;
 
   try {
-    // todo 分页
     const res = await exec(
       sql
         .table("student")
@@ -49,7 +48,6 @@ const queryOneStudent = async (data) => {
 
 // 新建学生
 const addStudent = async (data) => {
-  console.log(data, "data");
   try {
     const res = await exec(sql.table("student").data(data).insert());
 
@@ -60,7 +58,24 @@ const addStudent = async (data) => {
 };
 
 // 编辑学生
-const editStudent = async () => {};
+const edit = async (data) => {
+  const { id, ...rest } = data;
+
+  try {
+    const res = await exec(
+      sql
+        .table("student")
+        .data(rest)
+        .where({
+          id,
+        })
+        .update()
+    );
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // 删除学生
 const removeStudent = async (data) => {
@@ -94,9 +109,28 @@ const removeStudent = async (data) => {
   }
 };
 
+// 导出学生表
+const exportStu = async (data) => {
+  try {
+    const res = await exec(
+      sql
+        .table("student")
+        .page(1, 10000)
+        .where({ ...getQueryData(data) })
+        .select()
+    );
+
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   queryStudent,
   addStudent,
   removeStudent,
   queryOneStudent,
+  exportStu,
+  edit,
 };

@@ -1,4 +1,9 @@
-const { queryStudent, addStudent } = require("../../service/student");
+const {
+  queryStudent,
+  addStudent,
+  removeStudent,
+  queryOneStudent,
+} = require("../../service/student");
 const { commonResult, commonServerWrongResult } = require("../common");
 
 class StudentController {
@@ -13,6 +18,20 @@ class StudentController {
       });
     } catch (err) {
       commonServerWrongResult(ctx, `获取学员列表失败：${err}`);
+    }
+  }
+
+  // 获取单个学员
+  async getStudent(ctx, next) {
+    try {
+      const res = await queryOneStudent(ctx.request.body);
+
+      commonResult(ctx, {
+        status: 200,
+        data: res,
+      });
+    } catch (err) {
+      commonServerWrongResult(ctx, `获取单个学员失败：${err}`);
     }
   }
 
@@ -39,7 +58,18 @@ class StudentController {
 
   // 删除学员
   async deleteStudent(ctx, next) {
-    ctx.body = "删除学员";
+    try {
+      const res = await removeStudent(ctx.request.body);
+
+      if (res.length > 0) {
+        commonResult(ctx, {
+          status: 200,
+          message: "删除成功",
+        });
+      }
+    } catch (err) {
+      commonServerWrongResult(ctx, `删除学员失败：${err}`);
+    }
   }
 }
 

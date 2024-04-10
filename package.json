@@ -21,6 +21,7 @@
     "mysqls": "^1.2.2",
     "node-gyp": "^10.0.1",
     "promisfy": "^1.2.0",
+    "radash": "^12.1.0",
     "sequelize": "^6.37.1"
   },
   "devDependencies": {

@@ -3,6 +3,13 @@ const GENDER = {
   2: "女",
 };
 
+const TABLENAME = {
+  STUDENT: "student",
+  ADMIN: "admin",
+  TEACHER: "teacher",
+};
+
 module.exports = {
   GENDER,
+  TABLENAME,
 };

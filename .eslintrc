@@ -1,0 +1,24 @@
+{
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "globals": {
+    "exampleGlobalVariable": true
+  },
+  "rules": {
+    "no-console": 0,
+    "space-infix-ops": "error",
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ],
+    "space-before-blocks": ["error", "always"],
+    "semi": ["error", "never"]
+  },
+  "plugins": []
+}

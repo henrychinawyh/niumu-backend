@@ -1,25 +1,34 @@
-const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
-const {
-  getLimitData,
-  getQueryData,
-  toUnderlineData,
-} = require("../../utils/database");
+const { exec, sql, transaction } = require("../../db/seq");
+const { toUnderlineData, getQueryData } = require("../../utils/database");
 
-// 查询学生
-const queryStudent = async (data) => {
+// 新建教师
+const addTeacher = async (data) => {
+  try {
+    const res = await exec(
+      sql.table(TABLENAME.TEACHER).data(toUnderlineData(data)).insert()
+    );
+
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+// 查询教师
+const queryTeacher = async (data) => {
   const { current = 1, pageSize = 10 } = data;
 
   try {
     const res = await exec(
       sql
-        .table(TABLENAME.STUDENT)
+        .table(TABLENAME.TEACHER)
         .field([
           "id",
           "status",
           'IFNULL(birth_date, "") AS birthDate',
           'IFNULL(phone_number, "") AS phoneNumber',
-          'IFNULL(stu_name, "") AS stuName',
+          'IFNULL(tea_name, "") AS teaName',
           'IFNULL(id_card, "") AS idCard',
           'IFNULL(create_ts, "") AS createTs',
           'IFNULL(update_ts, "") AS updateTs',
@@ -33,7 +42,7 @@ const queryStudent = async (data) => {
 
     const total = await exec(
       sql
-        .table(TABLENAME.STUDENT)
+        .table(TABLENAME.TEACHER)
         .where({ ...toUnderlineData(getQueryData(data)) })
         .count("*", "total")
         .select()
@@ -50,40 +59,14 @@ const queryStudent = async (data) => {
   }
 };
 
-// 查询学生
-const queryOneStudent = async (data) => {
-  const { stuName } = data;
-  try {
-    const res = await exec(`
-    SELECT stu_name AS stuName, id FROM student WHERE stu_name LIKE '${stuName}%' AND status=1
-    `);
-    return res;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// 新建学生
-const addStudent = async (data) => {
-  try {
-    const res = await exec(
-      sql.table(TABLENAME.STUDENT).data(toUnderlineData(data)).insert()
-    );
-
-    return res;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-// 编辑学生
+// 编辑教师
 const edit = async (data) => {
   const { id, ...rest } = data;
 
   try {
     const res = await exec(
       sql
-        .table(TABLENAME.STUDENT)
+        .table(TABLENAME.TEACHER)
         .data(toUnderlineData(rest))
         .where({
           id,
@@ -96,8 +79,8 @@ const edit = async (data) => {
   }
 };
 
-// 删除学生
-const removeStudent = async (data) => {
+// 删除教师
+const removeTeacher = async (data) => {
   const { ids } = data || {};
 
   try {
@@ -105,7 +88,7 @@ const removeStudent = async (data) => {
       Array.isArray(ids)
         ? ids.map((id) =>
             sql
-              .table(TABLENAME.STUDENT)
+              .table(TABLENAME.TEACHER)
               .data({
                 status: 99,
               })
@@ -114,7 +97,7 @@ const removeStudent = async (data) => {
           )
         : [
             sql
-              .table(TABLENAME.STUDENT)
+              .table(TABLENAME.TEACHER)
               .data({
                 status: 99,
               })
@@ -128,16 +111,17 @@ const removeStudent = async (data) => {
   }
 };
 
-// 导出学生表
-const exportStu = async (data) => {
+// 导出教师表
+
+const exportTea = async (data) => {
   try {
     const res = await exec(
       sql
-        .table(TABLENAME.STUDENT)
+        .table(TABLENAME.TEACHER)
         .field([
           'IFNULL(birth_date, "") AS birthDate',
           'IFNULL(phone_number, "") AS phoneNumber',
-          'IFNULL(stu_name, "") AS stuName',
+          'IFNULL(tea_name, "") AS teaName',
           'IFNULL(id_card, "") AS idCard',
           'IFNULL(create_ts, "") AS createTs',
           "sex",
@@ -155,10 +139,9 @@ const exportStu = async (data) => {
 };
 
 module.exports = {
-  queryStudent,
-  addStudent,
-  removeStudent,
-  queryOneStudent,
-  exportStu,
+  addTeacher,
+  queryTeacher,
   edit,
+  removeTeacher,
+  exportTea,
 };

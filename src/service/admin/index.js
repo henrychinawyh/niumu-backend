@@ -1,11 +1,12 @@
 const { exec, sql } = require("../../db/seq");
+const { TABLENAME } = require("../../utils/constant");
 
 // 注册管理员
 const createAdmin = async (data) => {
   const { username, password } = data;
   try {
     const res = await exec(
-      sql.table("admin").data({ account: username, password }).insert()
+      sql.table(TABLENAME.ADMIN).data({ account: username, password }).insert()
     );
 
     return {
@@ -25,11 +26,11 @@ const createAdmin = async (data) => {
 const queryAdmin = async (data) => {
   let res;
   if (typeof data === "object") {
-    res = await exec(sql.table("admin").select());
+    res = await exec(sql.table(TABLENAME.ADMIN).select());
   } else {
     res = await exec(
       sql
-        .table("admin")
+        .table(TABLENAME.ADMIN)
         .where({
           account: data,
         })
@@ -44,7 +45,7 @@ const queryAdmin = async (data) => {
 const updateById = async ({ id, ...rest }) => {
   const res = await exec(
     sql
-      .table("admin")
+      .table(TABLENAME.ADMIN)
       .data(rest)
       .where({
         id,

@@ -7,6 +7,7 @@ const {
   edit,
 } = require("../../service/student");
 const { GENDER } = require("../../utils/constant");
+const { exportExcel } = require("../../utils/export");
 const { commonResult, commonServerWrongResult } = require("../common");
 const dayjs = require("dayjs");
 const xlsx = require("node-xlsx");
@@ -93,68 +94,35 @@ class StudentController {
     try {
       const res = await exportStu(ctx.request.body);
 
-      if (Array.isArray(res) && res.length > 0) {
-        const name = `学员表${dayjs().format("YYYY-MM-DD")}`;
-
-        let xlsxObj = [
-          {
-            name,
-            data: [],
-          },
+      if (Array.isArray(res)) {
+        const name = `学员表`;
+        const titleArr = [
+          "学员姓名",
+          "年龄",
+          "性别",
+          "手机号",
+          "身份证号",
+          "生日",
+          "入学时间",
         ];
-
-        res.forEach((item, idx) => {
-          if (idx === 0) {
-            // 插入第一行title
-            xlsxObj[0].data.push([
-              "学员姓名",
-              "手机号",
-              "性别",
-              "身份证号",
-              "生日",
-              "入学时间",
-            ]);
-          }
-
-          //  插入数据
-          const { stuName, phoneNumber, sex, idCard, birthDate, createTs } =
-            res[idx] || {};
-          xlsxObj[0].data.push([
+        const dataArr = res.map(
+          ({ stuName, phoneNumber, sex, idCard, birthDate, createTs, age }) => [
             stuName,
-            phoneNumber,
+            age,
             GENDER[sex],
+            phoneNumber,
             idCard,
             dayjs(birthDate).format("YYYY-MM-DD"),
             dayjs(createTs).format("YYYY-MM-DD"),
-          ]);
+          ]
+        );
+
+        exportExcel({
+          ctx,
+          name,
+          titleArr,
+          dataArr,
         });
-
-        let options = {
-          sheetOptions: {
-            "!cols": [
-              { wch: 24 },
-              { wch: 24 },
-              { wch: 24 },
-              { wch: 24 },
-              { wch: 40 },
-              { wch: 40 },
-            ],
-          },
-        };
-
-        const buffer = xlsx.build(xlsxObj, options);
-
-        ctx.set(
-          "Content-disposition",
-          `attachment; filename=${encodeURIComponent(name)}.xlsx`
-        );
-        ctx.set(
-          "Content-Type",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        );
-        ctx.set("Access-Control-Expose-Headers", "Content-Disposition");
-
-        ctx.body = buffer;
       }
     } catch (err) {
       console.log(err);

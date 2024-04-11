@@ -30,18 +30,14 @@ create table student
 
 create table teacher
 (
-    id           bigint primary key auto_increment not null comment '',
-    admin_id     bigint                            null comment '',
-    account      varchar(30)                       null comment '',
-    `password`   varchar(30)                       null comment '',
-    birth_date   timestamp                         not null comment '',
-    age          int                               not null,
+    id           bigint primary key auto_increment not null comment '教师id',
+    tea_name     varchar(50)                       not null comment '教师姓名',
+    birth_date   timestamp                         not null comment '教师生日',
+    age          int                               not null comment '教师年龄',
     phone_number varchar(100)                      not null comment '联系方式，用英文逗号隔开',
-    tea_name     varchar(50)                       not null comment '学生姓名',
     status       int                               not null default 1 comment '1 有效 99 删除',
-    create_ts    timestamp                         not null default current_timestamp,
-    update_ts    timestamp                         not null default current_timestamp on update current_timestamp,
-    unique idx_account (account),
+    create_ts    timestamp                         not null default current_timestamp comment '创建时间', 
+    update_ts    timestamp                         not null default current_timestamp on update current_timestamp comment '更新时间',
     index idx_tea_name (tea_name),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
@@ -154,7 +150,7 @@ create table teacher_class
     curr_student_count  int                               not null default 0 comment '当前学生数量',
     status              int                               not null default 1 comment '1 有效 99 删除',
     create_ts           timestamp                         not null default current_timestamp,
-    update_ts           timestamp                         not null default current_timestamp on update current_timestamp,
+    update_ts           timestamp                         not null default current_timestamp on update current_timestamp comment '更新时间',
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
 ) comment '老师关联班级';

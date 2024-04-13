@@ -45,7 +45,7 @@ create table teacher
 
 create table course
 (
-    id        bigint primary key auto_increment not null comment '',
+    id        bigint primary key auto_increment not null comment '课程id',
     name      varchar(50)                       not null comment '课程名字',
     status    int                               not null default 1 comment '1 有效 99 删除',
     create_ts timestamp                         not null default current_timestamp,
@@ -57,9 +57,8 @@ create table course
 
 create table course_grade
 (
-    id        bigint primary key auto_increment not null comment '',
+    id        bigint primary key auto_increment not null comment '级别id',
     course_id bigint                            not null comment '课程id',
-    grade     int                               not null comment '级别',
     name      varchar(50)                       not null comment '级别名字',
     status    int                               not null default 1 comment '1 有效 99 删除',
     create_ts timestamp                         not null default current_timestamp,
@@ -71,8 +70,8 @@ create table course_grade
 
 create table class
 (
-    id        bigint primary key auto_increment not null comment '',
-    grade_id  bigint                            not null comment '课程id',
+    id        bigint primary key auto_increment not null comment '班级id',
+    grade_id  bigint                            not null comment '级别id',
     name      varchar(50)                       not null comment '班级名字',
     status    int                               not null default 1 comment '1 有效 99 删除',
     create_ts timestamp                         not null default current_timestamp,
@@ -97,8 +96,8 @@ create table student_class
 
 create table student_pay_class_record
 (
-    id                  bigint primary key auto_increment not null comment '',
-    student_class_id    bigint                            not null comment '',
+    id                  bigint primary key auto_increment not null comment '学生支付课程记录',
+    student_class_id    bigint                            not null comment '学生班级id',
     student_id          bigint                            not null comment '学生id',
     class_id            bigint                            not null comment 'class#id',
     member              int                               not null default 0 comment '0 非会员 1会员',

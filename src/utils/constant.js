@@ -7,6 +7,9 @@ const TABLENAME = {
   STUDENT: "student",
   ADMIN: "admin",
   TEACHER: "teacher",
+  CLASS: "class",
+  COURSEGRADE: "course_grade",
+  COURSE: "course",
 };
 
 module.exports = {

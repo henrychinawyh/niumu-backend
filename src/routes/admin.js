@@ -1,3 +1,4 @@
+// eslint-disable-next-line semi
 const Router = require("koa-router");
 const {
   register,

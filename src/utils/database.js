@@ -33,10 +33,37 @@ const toUnderlineData = (data) => {
   }, {});
 };
 
+// 校验数据是否为数组，比较数组长度和传入最小值
+const compareArrayWithMin = (data, opt = ">", min = 0) => {
+  if (Array.isArray(data)) {
+    switch (opt) {
+      case "<":
+        return data.length < min;
+      case "===":
+        return data.length === min;
+      case "!==":
+        return data.length !== min;
+      case "==":
+        return data.length == min;
+      case "!=":
+        return data.length != min;
+      case ">=":
+        return data.length >= min;
+      case "<=":
+        return data.length <= min;
+      default:
+        return data.length > min;
+    }
+  }
+
+  return false;
+};
+
 module.exports = {
   createTableCallback,
   getLimitData,
   getQueryData,
   toUnderline,
   toUnderlineData,
+  compareArrayWithMin,
 };

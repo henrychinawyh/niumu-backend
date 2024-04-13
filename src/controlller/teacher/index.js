@@ -9,7 +9,6 @@ const { GENDER } = require("../../utils/constant");
 const { exportExcel } = require("../../utils/export");
 const { commonResult, commonServerWrongResult } = require("../common");
 const dayjs = require("dayjs");
-const xlsx = require("node-xlsx");
 
 class TeacherController {
   // 获取教师列表

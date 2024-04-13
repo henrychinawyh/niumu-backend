@@ -1,7 +1,8 @@
 {
   "env": {
     "node": true,
-    "browser": true
+    "browser": true,
+    "es6": true
   },
   "globals": {
     "exampleGlobalVariable": true
@@ -9,16 +10,19 @@
   "rules": {
     "no-console": 0,
     "space-infix-ops": "error",
+    "semi": "off",
     "quotes": [
       "error",
-      "single",
+      "double",
       {
         "avoidEscape": true,
         "allowTemplateLiterals": true
       }
     ],
-    "space-before-blocks": ["error", "always"],
-    "semi": ["error", "never"]
+    "space-before-blocks": ["error", "always"]
   },
-  "plugins": []
+  "plugins": [],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  }
 }

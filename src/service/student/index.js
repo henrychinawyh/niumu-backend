@@ -41,7 +41,7 @@ const queryStudent = async (data) => {
 
     return {
       list: res,
-      total: total[0].total || 0,
+      total: total?.[0]?.total || 0,
       current,
       pageSize,
     };

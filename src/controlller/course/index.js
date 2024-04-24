@@ -1,5 +1,12 @@
 const { commonResult, commonServerWrongResult } = require("../common");
-const { addCourse, queryCourseList } = require("../../service/course");
+const {
+  addCourse,
+  queryCourseList,
+  delCourse,
+  edit,
+  getGrade,
+  delGrade,
+} = require("../../service/course");
 
 class CourseController {
   // 新建课程
@@ -21,6 +28,47 @@ class CourseController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `获取课程列表失败：${err}`);
+    }
+  }
+
+  // 删除课程
+  async deleteCourse(ctx, next) {
+    try {
+      const res = await delCourse(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `删除课程失败：${err}`);
+    }
+  }
+
+  // 编辑课程
+  async editCourse(ctx, next) {
+    try {
+      const res = await edit(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `编辑课程失败：${err}`);
+    }
+  }
+
+  // 获取课程的级别
+  async getCourseGrade(ctx, next) {
+    try {
+      const res = await getGrade(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `获取课程级别失败：${err}`);
+    }
+  }
+
+  // 删除课程的级别
+  async deleteCourseGrade(ctx, next) {
+    try {
+      const res = await delGrade(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `删除课程级别失败：${err}`);
     }
   }
 }

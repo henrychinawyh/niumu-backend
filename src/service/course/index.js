@@ -76,11 +76,11 @@ const queryCourseList = async (data) => {
           'IFNULL(update_ts, "") AS updateTs',
         ])
         .page(current, pageSize)
-        .where({ ...toUnderlineData(getQueryData(data)) })
+        .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
         .select(),
       sql
         .table(TABLENAME.COURSE)
-        .where({ ...toUnderlineData(getQueryData(data)) })
+        .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
         .count("*", "total")
         .select(),
     ]);
@@ -104,7 +104,116 @@ const queryCourseList = async (data) => {
   }
 };
 
+// 删除课程
+const delCourse = async (data) => {
+  const { id, ...rest } = data;
+
+  try {
+    await transaction([
+      // 删除课程
+      sql.table(TABLENAME.COURSE).data({ status: 99 }).where({ id }).update(),
+      // 删除课程下所有的级别
+      sql
+        .table(TABLENAME.COURSEGRADE)
+        .data({ status: 99 })
+        .where(toUnderlineData(rest))
+        .update(),
+    ]);
+    // todo 删除所有课程下的班级
+    // todo 删除所有班级下绑定的学员
+    return {
+      message: "删除成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+
+// 编辑课程
+const edit = async (data) => {
+  const { id, ...rest } = data;
+  try {
+    // 编辑课程名称
+    await exec(
+      sql
+        .table(TABLENAME.COURSE)
+        .data(toUnderlineData(rest))
+        .where({ id })
+        .update()
+    );
+
+    return {
+      message: "操作成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+
+// 获取课程下所有的级别
+const getGrade = async (data) => {
+  try {
+    const res = await exec(
+      sql
+        .table(TABLENAME.COURSEGRADE)
+        .field(["id", "name"])
+        .where({
+          ...toUnderlineData(data),
+          status: 1,
+        })
+        .select()
+    );
+
+    return {
+      data: {
+        list: res,
+        total: res?.length || 0,
+      },
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+// 删除课程的级别
+const delGrade = async (data) => {
+  try {
+    // 删除级别
+    await transaction([
+      sql
+        .table(TABLENAME.COURSEGRADE)
+        .data({ status: 99 })
+        .where(toUnderlineData(data))
+        .update(),
+    ]);
+
+    // todo 删除级别下的班级
+    // todo 删除级别下的班级以及班级里的学员
+
+    return {
+      message: "操作成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+
 module.exports = {
   addCourse,
   queryCourseList,
+  delCourse,
+  edit,
+  getGrade,
+  delGrade,
 };

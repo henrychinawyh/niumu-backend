@@ -1,4 +1,4 @@
-const commonResult = (ctx, { data = null, message, status }) => {
+const commonResult = (ctx, { data = null, message, status = 200 }) => {
   let body = {
     code: status === 200 ? "000" : "-1",
   };

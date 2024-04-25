@@ -7,6 +7,7 @@ const {
   convertListToSelectOption,
   toUnderline,
   convertIfNull,
+  convertJoinWhere,
 } = require("../../utils/database");
 
 // 新建教师
@@ -53,7 +54,11 @@ const queryTeacher = async (data) => {
           ],
         })
         .page(current, pageSize)
-        .where({ ...toUnderlineData(getQueryData(data)) })
+        .where({
+          ...convertJoinWhere(toUnderlineData(getQueryData(data)), {
+            status: TABLENAME.TEACHER,
+          }),
+        })
         .select()
     );
 

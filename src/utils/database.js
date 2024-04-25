@@ -89,6 +89,18 @@ const convertIfNull = (str = "", defaultValue = "", dataBaseName) => {
   }, ${defaultValue || "null"}) AS ${str}`;
 };
 
+// 若where条件在连表查询之后，需要对重复字段做处理
+const convertJoinWhere = (data, formatObj = {}) => {
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => {
+      if (formatObj[key]) {
+        return [`${formatObj[key]}.${key}`, value]; // "databaseTable.column": value
+      }
+
+      return [key, value];
+    })
+  );
+};
 module.exports = {
   createTableCallback,
   getLimitData,
@@ -99,4 +111,5 @@ module.exports = {
   underlineToCamel,
   convertListToSelectOption,
   convertIfNull,
+  convertJoinWhere,
 };

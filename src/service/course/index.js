@@ -181,7 +181,7 @@ const getGrade = async (data) => {
     const res = await exec(
       sql
         .table(TABLENAME.COURSEGRADE)
-        .field(["id", "name"])
+        .field(convertListToSelectOption(["id", "name"]))
         .where({
           ...toUnderlineData(data),
           status: 1,

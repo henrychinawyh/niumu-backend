@@ -5,6 +5,7 @@ const {
   editTeacher,
   deleteTeacher,
   exportTeacher,
+  queryTeacherWithCourse,
 } = require("../controlller/teacher");
 
 const router = new Router({
@@ -25,5 +26,8 @@ router.post("/editTeacher", editTeacher);
 
 // 导出教师表
 router.post("/exportTeacher", exportTeacher);
+
+// 按照任职课程查询教师
+router.post("/queryTeacherWithCourse", queryTeacherWithCourse);
 
 module.exports = router;

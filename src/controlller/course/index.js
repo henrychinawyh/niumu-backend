@@ -6,6 +6,8 @@ const {
   edit,
   getGrade,
   delGrade,
+  editGrade,
+  getAllCourses,
 } = require("../../service/course");
 
 class CourseController {
@@ -28,6 +30,17 @@ class CourseController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `获取课程列表失败：${err}`);
+    }
+  }
+
+  // 获取所有课程
+  async getAll(ctx, next) {
+    try {
+      const res = await getAllCourses(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `获取所有课程失败：${err}`);
     }
   }
 
@@ -69,6 +82,17 @@ class CourseController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `删除课程级别失败：${err}`);
+    }
+  }
+
+  // 编辑课程级别
+  async editCourseGrade(ctx, next) {
+    try {
+      const res = await editGrade(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `编辑课程级别失败：${err}`);
     }
   }
 }

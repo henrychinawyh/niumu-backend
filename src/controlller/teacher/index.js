@@ -4,6 +4,7 @@ const {
   edit,
   removeTeacher,
   exportTea,
+  searchTeacherWithCourse,
 } = require("../../service/teacher");
 const { GENDER } = require("../../utils/constant");
 const { exportExcel } = require("../../utils/export");
@@ -110,6 +111,17 @@ class TeacherController {
       }
     } catch (err) {
       commonServerWrongResult(ctx, `导出教师表失败：${err}`);
+    }
+  }
+
+  // 按照任职课程查询教师
+  async queryTeacherWithCourse(ctx, next) {
+    try {
+      const res = await searchTeacherWithCourse(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `获取教师失败：${err}`);
     }
   }
 }

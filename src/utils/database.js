@@ -33,6 +33,15 @@ const toUnderlineData = (data) => {
   }, {});
 };
 
+// 将下划线转成小驼峰
+const underlineToCamel = (str) => {
+  return str
+    .replace(/_([a-z])/g, function (all, letter) {
+      return letter.toUpperCase();
+    })
+    .replace(/^_/, "");
+};
+
 // 校验数据是否为数组，比较数组长度和传入最小值
 const compareArrayWithMin = (data, opt = ">", min = 0) => {
   if (Array.isArray(data)) {
@@ -59,6 +68,27 @@ const compareArrayWithMin = (data, opt = ">", min = 0) => {
   return false;
 };
 
+// 将查询的列表数据转换为下拉列表的格式
+const convertListToSelectOption = (data) => {
+  if (Array.isArray(data)) {
+    return [`${data[0]} AS value`, `${data[1]} AS label`];
+  } else {
+    return [];
+  }
+};
+
+// 判断字符串是否为小驼峰格式
+const isCamelCase = (str) => {
+  return /^[a-z]+([A-Z][a-z]*)*$/.test(str);
+};
+
+// 处理查询出来的数据为ifNull 然后做特殊处理
+const convertIfNull = (str = "", defaultValue = "", dataBaseName) => {
+  return `IFNULL(${dataBaseName ? `${dataBaseName}.` : ""}${
+    isCamelCase(str) ? toUnderline(str) : str
+  }, ${defaultValue || "null"}) AS ${str}`;
+};
+
 module.exports = {
   createTableCallback,
   getLimitData,
@@ -66,4 +96,7 @@ module.exports = {
   toUnderline,
   toUnderlineData,
   compareArrayWithMin,
+  underlineToCamel,
+  convertListToSelectOption,
+  convertIfNull,
 };

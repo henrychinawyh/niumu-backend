@@ -10,6 +10,9 @@ const TABLENAME = {
   CLASS: "class",
   COURSEGRADE: "course_grade",
   COURSE: "course",
+  CLASS: "class",
+  STUDENTCLASS: "student_class",
+  TEACHERCLASS: "teacher_class",
 };
 
 module.exports = {

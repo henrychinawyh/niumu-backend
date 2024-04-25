@@ -1,6 +1,13 @@
 const { TABLENAME } = require("../../utils/constant");
 const { exec, sql, transaction } = require("../../db/seq");
-const { toUnderlineData, getQueryData } = require("../../utils/database");
+const {
+  toUnderlineData,
+  getQueryData,
+  underlineToCamel,
+  convertListToSelectOption,
+  toUnderline,
+  convertIfNull,
+} = require("../../utils/database");
 
 // 新建教师
 const addTeacher = async (data) => {
@@ -24,17 +31,27 @@ const queryTeacher = async (data) => {
       sql
         .table(TABLENAME.TEACHER)
         .field([
-          "id",
-          "status",
-          'IFNULL(birth_date, "") AS birthDate',
-          'IFNULL(phone_number, "") AS phoneNumber',
-          'IFNULL(tea_name, "") AS teaName',
-          'IFNULL(id_card, "") AS idCard',
-          'IFNULL(create_ts, "") AS createTs',
-          'IFNULL(update_ts, "") AS updateTs',
+          `${TABLENAME.TEACHER}.id`,
+          `${TABLENAME.TEACHER}.status`,
+          `${convertIfNull("birthDate")}`,
+          `${convertIfNull("phoneNumber")}`,
+          `${convertIfNull("teaName")}`,
+          `${convertIfNull("idCard")}`,
+          `${convertIfNull("createTs", "", TABLENAME.TEACHER)}`,
+          `${convertIfNull("updateTs", "", TABLENAME.TEACHER)}`,
           "sex",
           "age",
+          `${TABLENAME.COURSE}.name AS courseName`,
         ])
+        .join({
+          dir: "left",
+          table: TABLENAME.COURSE,
+          where: [
+            {
+              [`${TABLENAME.TEACHER}.course_id`]: [`${TABLENAME.COURSE}.id`],
+            },
+          ],
+        })
         .page(current, pageSize)
         .where({ ...toUnderlineData(getQueryData(data)) })
         .select()
@@ -112,7 +129,6 @@ const removeTeacher = async (data) => {
 };
 
 // 导出教师表
-
 const exportTea = async (data) => {
   try {
     const res = await exec(
@@ -138,10 +154,35 @@ const exportTea = async (data) => {
   }
 };
 
+// 根据任职课程查询教师
+const searchTeacherWithCourse = async (data) => {
+  try {
+    const res = await exec(
+      sql
+        .table(TABLENAME.TEACHER)
+        .field(convertListToSelectOption(["id", `tea_name`]))
+        .where(toUnderlineData(data))
+        .select()
+    );
+
+    return {
+      data: {
+        list: res,
+      },
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+
 module.exports = {
   addTeacher,
   queryTeacher,
   edit,
   removeTeacher,
   exportTea,
+  searchTeacherWithCourse,
 };

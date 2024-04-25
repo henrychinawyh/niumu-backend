@@ -2,8 +2,8 @@ const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const {
   toUnderlineData,
-  compareArrayWithMin,
   getQueryData,
+  convertListToSelectOption,
 } = require("../../utils/database");
 
 // 添加课程
@@ -104,6 +104,24 @@ const queryCourseList = async (data) => {
   }
 };
 
+// 获取所有课程
+// todo 新增教师时需要获取课程，以给教师任课职位
+const getAllCourses = async (data) => {
+  try {
+    const res = await exec(
+      sql
+        .table(TABLENAME.COURSE)
+        .field(convertListToSelectOption(["id", "name"]))
+        .select()
+    );
+    return {
+      data: res,
+    };
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // 删除课程
 const delCourse = async (data) => {
   const { id, ...rest } = data;
@@ -116,7 +134,9 @@ const delCourse = async (data) => {
       sql
         .table(TABLENAME.COURSEGRADE)
         .data({ status: 99 })
-        .where(toUnderlineData(rest))
+        .where({
+          course_id: id,
+        })
         .update(),
     ]);
     // todo 删除所有课程下的班级
@@ -183,6 +203,7 @@ const getGrade = async (data) => {
     };
   }
 };
+
 // 删除课程的级别
 const delGrade = async (data) => {
   try {
@@ -209,6 +230,42 @@ const delGrade = async (data) => {
   }
 };
 
+// 编辑课程级别的名称
+const editGrade = async (data) => {
+  const { name, id, ...rest } = data || {};
+
+  try {
+    // 查询是否有重名的级别名称
+    const res = await exec(
+      sql
+        .table(TABLENAME.COURSEGRADE)
+        .field(["name"])
+        .where(toUnderlineData(rest))
+        .select()
+    );
+
+    if (Array.isArray(res) && res.some((item) => item.name === name)) {
+      return {
+        status: 500,
+        message: "该课程级别名称已存在，请重新命名",
+      };
+    }
+
+    await exec(
+      sql.table(TABLENAME.COURSEGRADE).data({ name }).where({ id }).update()
+    );
+
+    return {
+      message: "操作成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage,
+    };
+  }
+};
+
 module.exports = {
   addCourse,
   queryCourseList,
@@ -216,4 +273,6 @@ module.exports = {
   edit,
   getGrade,
   delGrade,
+  editGrade,
+  getAllCourses,
 };

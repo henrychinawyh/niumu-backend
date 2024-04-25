@@ -105,7 +105,6 @@ const queryCourseList = async (data) => {
 };
 
 // 获取所有课程
-// todo 新增教师时需要获取课程，以给教师任课职位
 const getAllCourses = async (data) => {
   try {
     const res = await exec(

@@ -93,11 +93,13 @@ const convertIfNull = (str = "", defaultValue = "", dataBaseName) => {
 const convertJoinWhere = (data, formatObj = {}) => {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => {
-      if (formatObj[key]) {
-        return [`${formatObj[key]}.${key}`, value]; // "databaseTable.column": value
+      let tempKey = toUnderline(key);
+
+      if (formatObj[tempKey]) {
+        return [`${formatObj[tempKey]}.${tempKey}`, value]; // "databaseTable.column": value
       }
 
-      return [key, value];
+      return [tempKey, value];
     })
   );
 };

@@ -1,4 +1,4 @@
-const { addClass } = require("../../service/class");
+const { addClass, getClass } = require("../../service/class");
 const { commonResult, commonServerWrongResult } = require("../common");
 
 class ClassController {
@@ -10,6 +10,17 @@ class ClassController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `新建班级失败：${err}`);
+    }
+  }
+
+  // 查询班级
+  async getClassList(ctx, next) {
+    try {
+      const res = await getClass(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `查询班级失败：${err}`);
     }
   }
 }

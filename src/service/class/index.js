@@ -10,6 +10,7 @@ const {
 const addClass = async (data) => {
   const { courseId, gradeId, name, teacherId, studentIds, ...rest } =
     data || {};
+
   try {
     const addClassRes = await transaction([
       // 新增班级-关联某个课程下的级别
@@ -17,6 +18,7 @@ const addClass = async (data) => {
         .table(TABLENAME.CLASS)
         .data({
           [toUnderline("gradeId")]: gradeId,
+          [toUnderline("courseId")]: courseId,
           name,
         })
         .insert(),
@@ -46,13 +48,17 @@ const addClass = async (data) => {
             .insert(),
         ].concat(
           // 关联班级中的学生
-          Array.isArray(studentIds) &&
-            studentIds.map((studentId) =>
-              sql.table(TABLENAME.STUDENTCLASS).data({
-                [toUnderline("studentId")]: studentId,
-                [toUnderline("classId")]: classId,
-              })
-            )
+          Array.isArray(studentIds)
+            ? studentIds.map((studentId) =>
+                sql
+                  .table(TABLENAME.STUDENTCLASS)
+                  .data({
+                    [toUnderline("studentId")]: studentId,
+                    [toUnderline("classId")]: classId,
+                  })
+                  .insert()
+              )
+            : []
         )
       );
 
@@ -61,6 +67,8 @@ const addClass = async (data) => {
       };
     }
   } catch (err) {
+    console.log(err);
+
     return {
       status: 500,
       message: err?.sqlMessage,

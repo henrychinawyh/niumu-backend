@@ -1,3 +1,4 @@
+const { addClass } = require("../../service/class");
 const { commonResult, commonServerWrongResult } = require("../common");
 
 class ClassController {

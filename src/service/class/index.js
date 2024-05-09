@@ -1,14 +1,16 @@
-const { where } = require("sequelize");
-const { exec, sql, transaction } = require("../../db/seq");
-const { TABLENAME } = require("../../utils/constant");
+const { exec, transaction } = require("../../db/seq");
+const { EMPTY_DATA } = require("../../utils/constant");
+const { compareArrayWithMin } = require("../../utils/database");
 const {
-  getQueryData,
-  toUnderline,
-  compareArrayWithMin,
-  convertIfNull,
-  convertJoinWhere,
-  toUnderlineData,
-} = require("../../utils/database");
+  addClassSql,
+  hasClassSql,
+  queryClassSql,
+  queryStudentTotalOfEachClassSql,
+  queryClassByIdSql,
+  queryClassTotalSql,
+  addTeacherForClassSql,
+  addStudentsForClassSql,
+} = require("./sql");
 
 /**
  * @name 新增班级
@@ -21,26 +23,23 @@ const {
  * @returns void
  */
 const addClass = async (data) => {
-  const { courseId, gradeId, name, teacherId, studentIds, ...rest } =
-    data || {};
+  const { teacherId, studentIds } = data || {};
 
   try {
+    // 查询是否有班级
+    const hasClassRes = await exec(hasClassSql(data));
+
+    if (hasClassRes) {
+      return {
+        status: 500,
+        message: "该班级已存在，请重新输入班级名称",
+      };
+    }
+
+    // 添加班级
     const addClassRes = await transaction([
-      // 新增班级-关联某个课程下的级别
-      sql
-        .table(TABLENAME.CLASS)
-        .data({
-          [toUnderline("gradeId")]: gradeId,
-          [toUnderline("courseId")]: courseId,
-          name,
-        })
-        .insert(),
-      // 查询该班级的班级id
-      sql
-        .table(TABLENAME.CLASS)
-        .field(["id"])
-        .where({ name, [toUnderline("gradeId")]: gradeId })
-        .select(),
+      addClassSql(data),
+      queryClassByIdSql(data),
     ]);
 
     const [addRes, searchRes] = addClassRes || [];
@@ -49,39 +48,23 @@ const addClass = async (data) => {
       // 查找到了班级
       const classId = searchRes[0].id;
 
-      await transaction(
-        [
-          // 关联班级中的老师
-          sql
-            .table(TABLENAME.TEACHERCLASS)
-            .data({
-              [toUnderline("teacherId")]: teacherId,
-              [toUnderline("classId")]: classId,
-            })
-            .insert(),
-        ].concat(
-          // 关联班级中的学生
-          Array.isArray(studentIds)
-            ? studentIds.map((studentId) =>
-                sql
-                  .table(TABLENAME.STUDENTCLASS)
-                  .data({
-                    [toUnderline("studentId")]: studentId,
-                    [toUnderline("classId")]: classId,
-                  })
-                  .insert()
-              )
-            : []
-        )
-      );
-
+      await transaction([
+        // 将老师关联到班级中
+        addTeacherForClassSql({
+          classId,
+          teacherId,
+        }),
+        // 将学生关联到班级中
+        ...addStudentsForClassSql({
+          classId,
+          studentIds,
+        }),
+      ]);
       return {
         message: "新增成功",
       };
     }
   } catch (err) {
-    console.log(err);
-
     return {
       status: 500,
       message: err?.sqlMessage,
@@ -105,74 +88,34 @@ const getClass = async (data) => {
 
   try {
     // 查询班级
-    const res = await transaction([
-      sql
-        .table(TABLENAME.CLASS)
-        .field([
-          `${TABLENAME.CLASS}.id AS classId`,
-          `${TABLENAME.CLASS}.name AS className`,
-          `${TABLENAME.COURSE}.name AS courseName`,
-          `${TABLENAME.COURSE}.id AS courseId`,
-          `${TABLENAME.COURSEGRADE}.id AS gradeId`,
-          `${TABLENAME.COURSEGRADE}.name AS gradeName`,
-          `${TABLENAME.TEACHER}.id AS teacherId`,
-          `${TABLENAME.TEACHER}.tea_name AS teacherName`,
-          `${convertIfNull("createTs", "", TABLENAME.CLASS)}`,
-        ])
-        .join([
-          {
-            dir: "left",
-            table: TABLENAME.COURSE,
-            where: {
-              [`${TABLENAME.CLASS}.course_id`]: [`${TABLENAME.COURSE}.id`],
-            },
-          },
-          {
-            dir: "left",
-            table: TABLENAME.COURSEGRADE,
-            where: {
-              [`${TABLENAME.CLASS}.grade_id`]: [`${TABLENAME.COURSEGRADE}.id`],
-            },
-          },
-          {
-            dir: "left",
-            table: TABLENAME.TEACHERCLASS,
-            where: {
-              [`${TABLENAME.CLASS}.id`]: [`${TABLENAME.TEACHERCLASS}.class_id`],
-            },
-          },
-          {
-            dir: "left",
-            table: TABLENAME.TEACHER,
-            where: {
-              [`${TABLENAME.TEACHERCLASS}.teacher_id`]: [
-                `${TABLENAME.TEACHER}.id`,
-              ],
-            },
-          },
-        ])
-        .page(current, pageSize)
-        .where({
-          ...convertJoinWhere(
-            toUnderlineData(getQueryData({ ...data, status: 1 })),
-            {
-              status: TABLENAME.CLASS,
-              createTs: TABLENAME.CLASS,
-              courseId: TABLENAME.COURSE,
-              classId: TABLENAME.CLASS,
-              gradeId: TABLENAME.COURSEGRADE,
-              name: TABLENAME.CLASS,
-              teaName: TABLENAME.TEACHER,
-            }
-          ),
-        })
-        .select(),
+    const [list, total] = await transaction([
+      queryClassSql(data), // 查询班级
+      queryClassTotalSql(data), // 查询班级总数
     ]);
 
-    return {
-      message: "查询成功",
-    };
+    if (Array.isArray(list) && list.length) {
+      const totalRes = await exec(queryStudentTotalOfEachClassSql(list));
+
+      // 根据查询到的班级，去查询班级里的人数
+      list.forEach((item, index) => {
+        item.total = totalRes?.[index]?.total || 0;
+      });
+
+      return {
+        data: {
+          list,
+          current,
+          pageSize,
+          total: total?.[0]?.total || 0,
+        },
+        message: "查询成功",
+      };
+    } else {
+      return EMPTY_DATA.LIST(current, pageSize);
+    }
   } catch (err) {
+    console.log(err);
+
     return {
       status: 500,
       message: err?.sqlMessage,

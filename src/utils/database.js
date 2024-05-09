@@ -1,5 +1,18 @@
 const { omit } = require("radash");
 
+/**
+ * @name 处理groupBy的查询参数
+ * @param {*} dataArr 处理列的名称集合
+ * @returns 名称字符串，使用,连接
+ */
+const handleGroupBy = (dataArr) => {
+  if (Array.isArray(dataArr)) {
+    return dataArr.map((item) => toUnderline(item)).join(",");
+  } else {
+    return "";
+  }
+};
+
 const createTableCallback = (err, result) => {
   if (err) {
     console.log("创建表失败", err);
@@ -93,13 +106,15 @@ const convertIfNull = (str = "", defaultValue = "", dataBaseName) => {
 const convertJoinWhere = (data, formatObj = {}) => {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => {
-      let tempKey = toUnderline(key);
-
-      if (formatObj[tempKey]) {
-        return [`${formatObj[tempKey]}.${tempKey}`, value]; // "databaseTable.column": value
+      if (key in formatObj) {
+        if (formatObj[key]?.includes(".")) {
+          return [formatObj[key], value];
+        } else {
+          return [`${formatObj[key]}.${toUnderline(key)}`, value];
+        }
+      } else {
+        return [toUnderline(key), value];
       }
-
-      return [tempKey, value];
     })
   );
 };
@@ -114,4 +129,5 @@ module.exports = {
   convertListToSelectOption,
   convertIfNull,
   convertJoinWhere,
+  handleGroupBy,
 };

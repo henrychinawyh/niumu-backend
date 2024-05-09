@@ -1,8 +1,10 @@
+// 性别
 const GENDER = {
   1: "男",
   2: "女",
 };
 
+// 数据库表
 const TABLENAME = {
   STUDENT: "student",
   ADMIN: "admin",
@@ -15,7 +17,21 @@ const TABLENAME = {
   TEACHERCLASS: "teacher_class",
 };
 
+// 空数据
+const EMPTY_DATA = {
+  LIST: (current, pageSize) => ({
+    data: {
+      list: [],
+      total: 0,
+      current,
+      pageSize,
+    },
+    message: "操作成功",
+  }),
+};
+
 module.exports = {
   GENDER,
   TABLENAME,
+  EMPTY_DATA,
 };

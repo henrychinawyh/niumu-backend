@@ -1,23 +1,23 @@
 module.exports = {
   types: [
-    { value: "feat", name: "🎸新增产品功能", emoji: "🎸" },
-    { value: "fix", name: "🐛修改bug", emoji: "🐛" },
-    { value: "docs", name: "✏️变更文档", emoji: "✏️" },
+    { value: "feat", name: "🎸feat: 新增产品功能", emoji: "🎸" },
+    { value: "fix", name: "🐛fix: 修改bug", emoji: "🐛" },
+    { value: "docs", name: "✏️docs: 变更文档", emoji: "✏️" },
     {
       value: "style",
-      name: "💄不改变代码功能的变动(如删除空格，格式化，去掉末尾分号等)",
+      name: "💄style: 不改变代码功能的变动(如删除空格，格式化，去掉末尾分号等)",
       emoji: "💄",
     },
     {
       value: "refactor",
-      name: "💡重构代码，不包括bug修复，功能新增",
+      name: "💡refactor: 重构代码，不包括bug修复，功能新增",
       emoji: "💡",
     },
-    { value: "perf", name: "⚡️代码优化", emoji: "⚡️" },
-    { value: "test", name: "💍增加，修改测试用例", emoji: "💍" },
+    { value: "perf", name: "⚡️perf: 代码优化", emoji: "⚡️" },
+    { value: "test", name: "💍test: 增加，修改测试用例", emoji: "💍" },
     {
       value: "chore",
-      name: "🤖对构建工具，库的更改,例如升级 npm 包、修改 webpack 配置",
+      name: "🤖chore: 对构建工具，库的更改,例如升级 npm 包、修改 webpack 配置",
       emoji: "🤖",
     },
     { value: "revert", name: "回滚commit" },

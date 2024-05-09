@@ -1,27 +1,27 @@
 module.exports = {
   types: [
-    { value: "feat", description: "🎸新增产品功能", emoji: "🎸" },
-    { value: "fix", description: "🐛修改bug", emoji: "🐛" },
-    { value: "docs", description: "✏️变更文档", emoji: "✏️" },
+    { value: "feat", name: "🎸新增产品功能", emoji: "🎸" },
+    { value: "fix", name: "🐛修改bug", emoji: "🐛" },
+    { value: "docs", name: "✏️变更文档", emoji: "✏️" },
     {
       value: "style",
-      description: "💄不改变代码功能的变动(如删除空格，格式化，去掉末尾分号等)",
+      name: "💄不改变代码功能的变动(如删除空格，格式化，去掉末尾分号等)",
       emoji: "💄",
     },
     {
       value: "refactor",
-      description: "💡重构代码，不包括bug修复，功能新增",
+      name: "💡重构代码，不包括bug修复，功能新增",
       emoji: "💡",
     },
-    { value: "perf", description: "⚡️代码优化", emoji: "⚡️" },
-    { value: "test", description: "💍增加，修改测试用例", emoji: "💍" },
+    { value: "perf", name: "⚡️代码优化", emoji: "⚡️" },
+    { value: "test", name: "💍增加，修改测试用例", emoji: "💍" },
     {
       value: "chore",
-      description: "🤖对构建工具，库的更改,例如升级 npm 包、修改 webpack 配置",
+      name: "🤖对构建工具，库的更改,例如升级 npm 包、修改 webpack 配置",
       emoji: "🤖",
     },
-    { value: "revert", description: "回滚commit" },
-    { value: "WIP", description: "正在进行中的工作" },
+    { value: "revert", name: "回滚commit" },
+    { value: "WIP", name: "正在进行中的工作" },
   ],
 
   scopes: [

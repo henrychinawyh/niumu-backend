@@ -10,7 +10,8 @@
     "lint-html": "eslint **/*.js -f html -o ./reports/lint-results.html",
     "lint-fix": "eslint --fix **/*.js",
     "prepare": "husky init",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "commit": "git add . && git cz"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -32,6 +33,11 @@
     "*.md": [
       "prettier --write"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -55,9 +61,12 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@eslint/eslintrc": "^3.0.2",
     "@eslint/js": "^9.0.0",
+    "commitizen": "^4.3.0",
+    "cz-customizable": "^7.0.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.29.1",
+    "git-cz": "^4.9.0",
     "globals": "^15.0.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",

@@ -1,34 +1,29 @@
 module.exports = {
   types: [
-    { value: "feat", name: "🎸feat: 新增产品功能", emoji: "🎸" },
-    { value: "fix", name: "🐛fix: 修改bug", emoji: "🐛" },
-    { value: "docs", name: "✏️docs: 变更文档", emoji: "✏️" },
+    { value: "feat", name: "🎸feat: 新增产品功能" },
+    { value: "fix", name: "🐛fix: 修改bug" },
+    { value: "docs", name: "✏️docs: 变更文档" },
     {
       value: "style",
       name: "💄style: 不改变代码功能的变动(如删除空格，格式化，去掉末尾分号等)",
-      emoji: "💄",
     },
     {
       value: "refactor",
       name: "💡refactor: 重构代码，不包括bug修复，功能新增",
-      emoji: "💡",
     },
-    { value: "perf", name: "⚡️perf: 代码优化", emoji: "⚡️" },
-    { value: "test", name: "💍test: 增加，修改测试用例", emoji: "💍" },
+    { value: "perf", name: "⚡️perf: 代码优化" },
+    { value: "test", name: "💍test: 增加，修改测试用例" },
     {
       value: "chore",
       name: "🤖chore: 对构建工具，库的更改,例如升级 npm 包、修改 webpack 配置",
-      emoji: "🤖",
     },
     { value: "revert", name: "回滚commit" },
     { value: "WIP", name: "正在进行中的工作" },
   ],
 
+  //   这里选择一个目录改动，可以是pages，components，utils，services，controller，store，assets等
   scopes: [
-    { name: "accounts" },
-    { name: "admin" },
-    { name: "exampleScope" },
-    { name: "changeMe" },
+    // { name: "accounts" },
   ],
 
   //   allowTicketNumber: false,

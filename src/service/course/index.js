@@ -5,10 +5,26 @@ const {
   getQueryData,
   convertListToSelectOption,
 } = require("../../utils/database");
+const {
+  hasCourseSql,
+  insertCourseSql,
+  queryCourseId,
+  batchInsertCourseGradeSql,
+  queryCourseListSql,
+  queryCourseListTotalSql,
+  getAllCoursesSql,
+  removeCourseSql,
+  removeCourseGradeSql,
+  editSql,
+  getGradeSql,
+  delGradeSql,
+  hasGradeInCourse,
+  updateGradeInCourseSql,
+} = require("./sql");
 
 // 添加课程
 const addCourse = async (data) => {
-  const { name, grades } = data;
+  const { grades } = data;
 
   if (!Array.isArray(grades)) {
     return {
@@ -19,34 +35,25 @@ const addCourse = async (data) => {
 
   try {
     // 查询课程是否已经新建
-    await exec(sql.table(TABLENAME.COURSE).where({ name }).select());
+    const hasCourse = await exec(hasCourseSql(data));
+    if (hasCourse?.length) {
+      return {
+        status: 500,
+        message: "课程已存在",
+      };
+    }
 
     // 插入课程并查询课程id
     const insertRes = await transaction([
-      sql
-        .table(TABLENAME.COURSE)
-        .data({
-          name,
-        })
-        .insert(),
-      sql.table(TABLENAME.COURSE).where({ name }).select(),
+      insertCourseSql(data),
+      queryCourseId(data),
     ]);
 
     const selectResData = insertRes?.[1];
     const { id } = selectResData[0];
 
     // 插入课程级别
-    await transaction(
-      grades.map((gradeItem) =>
-        sql
-          .table(TABLENAME.COURSEGRADE)
-          .data({
-            course_id: id,
-            ...gradeItem,
-          })
-          .insert()
-      )
-    );
+    await transaction(batchInsertCourseGradeSql(data, id));
 
     return {
       status: 200,
@@ -66,23 +73,8 @@ const queryCourseList = async (data) => {
 
   try {
     const res = await transaction([
-      sql
-        .table(TABLENAME.COURSE)
-        .field([
-          "id",
-          "name",
-          "status",
-          'IFNULL(create_ts, "") AS createTs',
-          'IFNULL(update_ts, "") AS updateTs',
-        ])
-        .page(current, pageSize)
-        .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
-        .select(),
-      sql
-        .table(TABLENAME.COURSE)
-        .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
-        .count("*", "total")
-        .select(),
+      queryCourseListSql(data),
+      queryCourseListTotalSql(data),
     ]);
 
     const [list, total] = res || [];
@@ -105,14 +97,9 @@ const queryCourseList = async (data) => {
 };
 
 // 获取所有课程
-const getAllCourses = async (data) => {
+const getAllCourses = async () => {
   try {
-    const res = await exec(
-      sql
-        .table(TABLENAME.COURSE)
-        .field(convertListToSelectOption(["id", "name"]))
-        .select()
-    );
+    const res = await exec(getAllCoursesSql());
     return {
       data: res,
     };
@@ -123,20 +110,12 @@ const getAllCourses = async (data) => {
 
 // 删除课程
 const delCourse = async (data) => {
-  const { id, ...rest } = data;
-
   try {
     await transaction([
       // 删除课程
-      sql.table(TABLENAME.COURSE).data({ status: 99 }).where({ id }).update(),
+      removeCourseSql(data),
       // 删除课程下所有的级别
-      sql
-        .table(TABLENAME.COURSEGRADE)
-        .data({ status: 99 })
-        .where({
-          course_id: id,
-        })
-        .update(),
+      removeCourseGradeSql(data),
     ]);
     // todo 删除所有课程下的班级
     // todo 删除所有班级下绑定的学员
@@ -153,16 +132,9 @@ const delCourse = async (data) => {
 
 // 编辑课程
 const edit = async (data) => {
-  const { id, ...rest } = data;
   try {
     // 编辑课程名称
-    await exec(
-      sql
-        .table(TABLENAME.COURSE)
-        .data(toUnderlineData(rest))
-        .where({ id })
-        .update()
-    );
+    await exec(editSql(data));
 
     return {
       message: "操作成功",
@@ -178,16 +150,7 @@ const edit = async (data) => {
 // 获取课程下所有的级别
 const getGrade = async (data) => {
   try {
-    const res = await exec(
-      sql
-        .table(TABLENAME.COURSEGRADE)
-        .field(convertListToSelectOption(["id", "name"]))
-        .where({
-          ...toUnderlineData(data),
-          status: 1,
-        })
-        .select()
-    );
+    const res = await exec(getGradeSql(data));
 
     return {
       data: {
@@ -207,13 +170,7 @@ const getGrade = async (data) => {
 const delGrade = async (data) => {
   try {
     // 删除级别
-    await transaction([
-      sql
-        .table(TABLENAME.COURSEGRADE)
-        .data({ status: 99 })
-        .where(toUnderlineData(data))
-        .update(),
-    ]);
+    await transaction([delGradeSql(data)]);
 
     // todo 删除级别下的班级
     // todo 删除级别下的班级以及班级里的学员
@@ -231,17 +188,11 @@ const delGrade = async (data) => {
 
 // 编辑课程级别的名称
 const editGrade = async (data) => {
-  const { name, id, ...rest } = data || {};
+  const { name } = data || {};
 
   try {
     // 查询是否有重名的级别名称
-    const res = await exec(
-      sql
-        .table(TABLENAME.COURSEGRADE)
-        .field(["name"])
-        .where(toUnderlineData(rest))
-        .select()
-    );
+    const res = await exec(hasGradeInCourse(data));
 
     if (Array.isArray(res) && res.some((item) => item.name === name)) {
       return {
@@ -250,9 +201,8 @@ const editGrade = async (data) => {
       };
     }
 
-    await exec(
-      sql.table(TABLENAME.COURSEGRADE).data({ name }).where({ id }).update()
-    );
+    // 更新级别名称
+    await exec(updateGradeInCourseSql(data));
 
     return {
       message: "操作成功",

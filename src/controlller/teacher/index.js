@@ -5,6 +5,7 @@ const {
   removeTeacher,
   exportTea,
   searchTeacherWithCourse,
+  searchTeacherByName,
 } = require("../../service/teacher");
 const { GENDER } = require("../../utils/constant");
 const { exportExcel } = require("../../utils/export");
@@ -13,7 +14,7 @@ const dayjs = require("dayjs");
 
 class TeacherController {
   // 获取教师列表
-  async createTeacher(ctx, next) {
+  async createTeacher(ctx) {
     try {
       const res = await addTeacher(ctx.request.body);
 
@@ -29,7 +30,7 @@ class TeacherController {
   }
 
   // 获取教师列表
-  async getTeacherList(ctx, next) {
+  async getTeacherList(ctx) {
     try {
       const res = await queryTeacher(ctx.request.body);
 
@@ -43,7 +44,7 @@ class TeacherController {
   }
 
   // 编辑教师
-  async editTeacher(ctx, next) {
+  async editTeacher(ctx) {
     try {
       const res = await edit(ctx.request.body);
 
@@ -59,7 +60,7 @@ class TeacherController {
   }
 
   // 删除教师
-  async deleteTeacher(ctx, next) {
+  async deleteTeacher(ctx) {
     try {
       const res = await removeTeacher(ctx.request.body);
 
@@ -75,7 +76,7 @@ class TeacherController {
   }
 
   // 导出教师表
-  async exportTeacher(ctx, next) {
+  async exportTeacher(ctx) {
     try {
       const res = await exportTea(ctx.request.body);
 
@@ -115,13 +116,27 @@ class TeacherController {
   }
 
   // 按照任职课程查询教师
-  async queryTeacherWithCourse(ctx, next) {
+  async queryTeacherWithCourse(ctx) {
     try {
       const res = await searchTeacherWithCourse(ctx.request.body);
 
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `获取教师失败：${err}`);
+    }
+  }
+
+  // 根据输入的教师名查询教师
+  async queryTeacherByName(ctx) {
+    try {
+      const res = await searchTeacherByName(ctx.request.body);
+
+      commonResult(ctx, {
+        status: 200,
+        data: res,
+      });
+    } catch (err) {
+      commonServerWrongResult(ctx, `查询教师失败：${err}`);
     }
   }
 }

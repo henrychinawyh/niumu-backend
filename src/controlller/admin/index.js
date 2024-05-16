@@ -9,7 +9,7 @@ class AdminController {
    * @param {*} ctx
    * @param {*} next
    */
-  async register(ctx, next) {
+  async register(ctx) {
     const { username, password } = ctx.request.body;
 
     const res = await createAdmin({ username, password });
@@ -17,14 +17,13 @@ class AdminController {
     commonResult(ctx, res);
   }
 
-  async login(ctx, next) {
+  async login(ctx) {
     const res = ctx.response.body;
     const admin = res[0];
 
     // 1. 获取用户信息（在token的payload中，记录id，username，admin_type）
     try {
       const { password, account, ...rest } = admin;
-
       ctx.cookies.set("username", encodeURIComponent(`${account}`), {
         sameSite: "strict",
       });
@@ -49,7 +48,7 @@ class AdminController {
   }
 
   // 改变密码
-  async changePassword(ctx, next) {
+  async changePassword(ctx) {
     // 1. 获取数据
     const id = ctx.state.admin.id;
     const password = ctx.request.body.password;
@@ -75,7 +74,7 @@ class AdminController {
     }
   }
 
-  async getCurrentUser(ctx, next) {
+  async getCurrentUser(ctx) {
     const username = decodeURIComponent(ctx.cookies.get("username"));
 
     try {

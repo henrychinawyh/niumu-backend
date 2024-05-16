@@ -1,43 +1,23 @@
 const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
+const { getQueryData, toUnderlineData } = require("../../utils/database");
 const {
-  getLimitData,
-  getQueryData,
-  toUnderlineData,
-} = require("../../utils/database");
+  queryStudentSql,
+  queryStudentListTotalSql,
+  queryOneStudentSql,
+  editSql,
+  removeStudentSql,
+  exportStuSql,
+  addStudentSql,
+} = require("./sql");
 
 // 查询学生
 const queryStudent = async (data) => {
   const { current = 1, pageSize = 10 } = data;
-
   try {
-    const res = await exec(
-      sql
-        .table(TABLENAME.STUDENT)
-        .field([
-          "id",
-          "status",
-          'IFNULL(birth_date, "") AS birthDate',
-          'IFNULL(phone_number, "") AS phoneNumber',
-          'IFNULL(stu_name, "") AS stuName',
-          'IFNULL(id_card, "") AS idCard',
-          'IFNULL(create_ts, "") AS createTs',
-          'IFNULL(update_ts, "") AS updateTs',
-          "sex",
-          "age",
-        ])
-        .page(current, pageSize)
-        .where({ ...toUnderlineData(getQueryData(data)) })
-        .select()
-    );
+    const res = await exec(queryStudentSql(data));
 
-    const total = await exec(
-      sql
-        .table(TABLENAME.STUDENT)
-        .where({ ...toUnderlineData(getQueryData(data)) })
-        .count("*", "total")
-        .select()
-    );
+    const total = await exec(queryStudentListTotalSql(data));
 
     return {
       list: res,
@@ -50,13 +30,10 @@ const queryStudent = async (data) => {
   }
 };
 
-// 查询学生
+// 查询单个学生
 const queryOneStudent = async (data) => {
-  const { stuName } = data;
   try {
-    const res = await exec(`
-    SELECT stu_name AS stuName, id FROM student WHERE stu_name LIKE '${stuName}%' AND status=1
-    `);
+    const res = await exec(queryOneStudentSql(data));
     return res;
   } catch (err) {
     console.log(err);
@@ -66,9 +43,7 @@ const queryOneStudent = async (data) => {
 // 新建学生
 const addStudent = async (data) => {
   try {
-    const res = await exec(
-      sql.table(TABLENAME.STUDENT).data(toUnderlineData(data)).insert()
-    );
+    const res = await exec(addStudentSql(data));
 
     return res;
   } catch (err) {
@@ -78,18 +53,8 @@ const addStudent = async (data) => {
 
 // 编辑学生
 const edit = async (data) => {
-  const { id, ...rest } = data;
-
   try {
-    const res = await exec(
-      sql
-        .table(TABLENAME.STUDENT)
-        .data(toUnderlineData(rest))
-        .where({
-          id,
-        })
-        .update()
-    );
+    const res = await exec(editSql(data));
     return res;
   } catch (err) {
     console.log(err);
@@ -98,30 +63,8 @@ const edit = async (data) => {
 
 // 删除学生
 const removeStudent = async (data) => {
-  const { ids } = data || {};
-
   try {
-    const res = await transaction(
-      Array.isArray(ids)
-        ? ids.map((id) =>
-            sql
-              .table(TABLENAME.STUDENT)
-              .data({
-                status: 99,
-              })
-              .where({ id })
-              .update()
-          )
-        : [
-            sql
-              .table(TABLENAME.STUDENT)
-              .data({
-                status: 99,
-              })
-              .where({ id: ids })
-              .update(),
-          ]
-    );
+    const res = await transaction(removeStudentSql(data));
     return res;
   } catch (err) {
     console.log(err, "err");
@@ -131,22 +74,7 @@ const removeStudent = async (data) => {
 // 导出学生表
 const exportStu = async (data) => {
   try {
-    const res = await exec(
-      sql
-        .table(TABLENAME.STUDENT)
-        .field([
-          'IFNULL(birth_date, "") AS birthDate',
-          'IFNULL(phone_number, "") AS phoneNumber',
-          'IFNULL(stu_name, "") AS stuName',
-          'IFNULL(id_card, "") AS idCard',
-          'IFNULL(create_ts, "") AS createTs',
-          "sex",
-          "age",
-        ])
-        .page(1, 10000)
-        .where({ ...toUnderlineData(getQueryData(data)) })
-        .select()
-    );
+    const res = await exec(exportStuSql(data));
 
     return res;
   } catch (err) {

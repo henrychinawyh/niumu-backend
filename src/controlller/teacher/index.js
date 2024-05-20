@@ -14,7 +14,7 @@ const dayjs = require("dayjs");
 
 class TeacherController {
   // 获取教师列表
-  async createTeacher(ctx) {
+  createTeacher = async (ctx) => {
     try {
       const res = await addTeacher(ctx.request.body);
 
@@ -27,10 +27,10 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `新建教师失败：${err}`);
     }
-  }
+  };
 
   // 获取教师列表
-  async getTeacherList(ctx) {
+  getTeacherList = async (ctx) => {
     try {
       const res = await queryTeacher(ctx.request.body);
 
@@ -41,10 +41,10 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `获取学员列表失败：${err}`);
     }
-  }
+  };
 
   // 编辑教师
-  async editTeacher(ctx) {
+  editTeacher = async (ctx) => {
     try {
       const res = await edit(ctx.request.body);
 
@@ -57,10 +57,10 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `编辑教师失败：${err}`);
     }
-  }
+  };
 
   // 删除教师
-  async deleteTeacher(ctx) {
+  deleteTeacher = async (ctx) => {
     try {
       const res = await removeTeacher(ctx.request.body);
 
@@ -73,10 +73,10 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `删除教师失败：${err}`);
     }
-  }
+  };
 
   // 导出教师表
-  async exportTeacher(ctx) {
+  exportTeacher = async (ctx) => {
     try {
       const res = await exportTea(ctx.request.body);
 
@@ -100,7 +100,7 @@ class TeacherController {
             idCard,
             dayjs(birthDate).format("YYYY-MM-DD"),
             dayjs(createTs).format("YYYY-MM-DD"),
-          ]
+          ],
         );
 
         exportExcel({
@@ -113,10 +113,10 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `导出教师表失败：${err}`);
     }
-  }
+  };
 
   // 按照任职课程查询教师
-  async queryTeacherWithCourse(ctx) {
+  queryTeacherWithCourse = async (ctx) => {
     try {
       const res = await searchTeacherWithCourse(ctx.request.body);
 
@@ -124,21 +124,18 @@ class TeacherController {
     } catch (err) {
       commonServerWrongResult(ctx, `获取教师失败：${err}`);
     }
-  }
+  };
 
   // 根据输入的教师名查询教师
-  async queryTeacherByName(ctx) {
+  queryTeacherByName = async (ctx) => {
     try {
       const res = await searchTeacherByName(ctx.request.body);
 
-      commonResult(ctx, {
-        status: 200,
-        data: res,
-      });
+      commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `查询教师失败：${err}`);
     }
-  }
+  };
 }
 
 module.exports = new TeacherController();

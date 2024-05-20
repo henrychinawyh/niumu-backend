@@ -8,6 +8,7 @@
     "exampleGlobalVariable": true,
   },
   "rules": {
+    "consistent-return": "off",
     "no-console": "off",
     "space-infix-ops": "error",
     "semi": "off",

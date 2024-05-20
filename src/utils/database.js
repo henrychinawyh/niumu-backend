@@ -115,9 +115,21 @@ const convertJoinWhere = (data, formatObj = {}) => {
       } else {
         return [toUnderline(key), value];
       }
-    })
+    }),
   );
 };
+
+// 根据给定的值进行升降序排列
+const handleOrder = (data) => {
+  if (Array.isArray(data)) {
+    return data.map((item) => `${item.column} ${item.sort}`).join(",");
+  } else if (typeof data === "string") {
+    return data;
+  } else {
+    return "";
+  }
+};
+
 module.exports = {
   createTableCallback,
   getLimitData,
@@ -130,4 +142,5 @@ module.exports = {
   convertIfNull,
   convertJoinWhere,
   handleGroupBy,
+  handleOrder,
 };

@@ -1,4 +1,5 @@
 const { exec, sql, transaction } = require("../../db/seq");
+const { transformData } = require("../../utils");
 const { TABLENAME } = require("../../utils/constant");
 const {
   toUnderlineData,
@@ -20,6 +21,7 @@ const {
   delGradeSql,
   hasGradeInCourse,
   updateGradeInCourseSql,
+  getAllSubjectsSql,
 } = require("./sql");
 
 // 添加课程
@@ -36,7 +38,7 @@ const addCourse = async (data) => {
   try {
     // 查询课程是否已经新建
     const hasCourse = await exec(hasCourseSql(data));
-    if (hasCourse?.length) {
+    if (hasCourse.length) {
       return {
         status: 500,
         message: "课程已存在",
@@ -62,7 +64,7 @@ const addCourse = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -91,7 +93,7 @@ const queryCourseList = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -125,7 +127,7 @@ const delCourse = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -142,7 +144,7 @@ const edit = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -161,7 +163,7 @@ const getGrade = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -181,7 +183,7 @@ const delGrade = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -210,7 +212,26 @@ const editGrade = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err?.sqlMessage || err,
+    };
+  }
+};
+
+// 获取课程-级别-班级信息
+const getAllSubjects = async (data) => {
+  const { layer } = data;
+
+  try {
+    const res = await exec(getAllSubjectsSql());
+
+    return {
+      data: transformData(res || [], layer),
+      status: 200,
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage || err,
     };
   }
 };
@@ -224,4 +245,5 @@ module.exports = {
   delGrade,
   editGrade,
   getAllCourses,
+  getAllSubjects,
 };

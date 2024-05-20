@@ -8,6 +8,7 @@ const {
   delGrade,
   editGrade,
   getAllCourses,
+  getAllSubjects,
 } = require("../../service/course");
 
 class CourseController {
@@ -89,6 +90,17 @@ class CourseController {
   async editCourseGrade(ctx, next) {
     try {
       const res = await editGrade(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `编辑课程级别失败：${err}`);
+    }
+  }
+
+  // 获取课程-级别-班级信息
+  async queryAllSubjects(ctx, next) {
+    try {
+      const res = await getAllSubjects(ctx.request.body);
 
       commonResult(ctx, res);
     } catch (err) {

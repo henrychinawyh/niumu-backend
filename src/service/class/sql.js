@@ -11,16 +11,30 @@ const {
 } = require("../../utils/database");
 
 /**
- * @name 查询是否有班级
+ * @name 查询当前的课程级别下是否有一个同名的班级名称SQL
  * @params {Number} courseId 课程id
  * @params {Number} gradeId 级别id
  * @params {Number} name 班级名称
  */
-const hasClassSql = (data) => {
+const hasClassByNameSql = (data) => {
   const { courseId, gradeId, name } = data;
   return sql
     .table(TABLENAME.CLASS)
     .where(toUnderlineData({ courseId, gradeId, name }))
+    .select();
+};
+
+/**
+ * @name 根据班级id查询是否存在班级
+ */
+const hasClassByIdSql = (data) => {
+  const { id } = data;
+
+  return sql
+    .table(TABLENAME.CLASS)
+    .where({
+      id,
+    })
     .select();
 };
 
@@ -72,9 +86,29 @@ const addStudentsForClassSql = (data) => {
             [toUnderline("studentId")]: studentId,
             [toUnderline("classId")]: classId,
           })
-          .insert()
+          .insert(),
       )
     : [];
+};
+
+/**
+ * @name 将学生与当前班级的关系解绑(从班级中删除学生)
+ */
+const removeStudentForClassSql = (data) => {
+  const { classId, list } = data;
+
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .data({
+      status: 99,
+    })
+    .where({
+      [toUnderline("classId")]: classId,
+      [toUnderline("studentId")]: {
+        in: list?.join(","),
+      },
+    })
+    .update();
 };
 
 /**
@@ -91,7 +125,7 @@ const queryClassByIdSql = (data) => {
 };
 
 /**
- * @name 查询班级
+ * @name 查询班级列表
  * @params {Number} courseId 课程id
  * @params {Number} gradeId 级别id
  * @params {Number} classId 班级id
@@ -154,14 +188,14 @@ const queryClassSql = (data) => {
           gradeId: `${TABLENAME.COURSEGRADE}.id`,
           name: TABLENAME.CLASS,
           teaName: TABLENAME.TEACHER,
-        })
+        }),
       ),
     })
     .select();
 };
 
 /**
- * @name 查询班级总数
+ * @name 查询班级列表总数
  */
 const queryClassTotalSql = (data) => {
   return sql
@@ -207,14 +241,49 @@ const queryClassTotalSql = (data) => {
           gradeId: `${TABLENAME.COURSEGRADE}.id`,
           name: TABLENAME.CLASS,
           teaName: TABLENAME.TEACHER,
-        })
+        }),
       ),
     })
     .select();
 };
 
 /**
- * @name 查询每个班级的人数
+ * @name 查询班级中的学员
+ * @param {Number} list 班级id-list
+ */
+const queryStudentOfEachClassSql = (data) => {
+  const { list } = data;
+
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .field([
+      `${TABLENAME.STUDENT}.id AS id`,
+      `${TABLENAME.STUDENT}.stu_name AS name`,
+      `${TABLENAME.STUDENT}.birth_date AS birthDate`,
+      `${TABLENAME.STUDENT}.sex AS sex`,
+      `${TABLENAME.STUDENTCLASS}.class_id AS classId`,
+      `${TABLENAME.STUDENTCLASS}.remain_course_count AS remainCourseCount`,
+    ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.STUDENT,
+        where: {
+          [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
+        },
+      },
+    ])
+    .where({
+      [`${TABLENAME.STUDENTCLASS}.class_id`]: {
+        in: list?.join(","),
+      },
+      [`${TABLENAME.STUDENTCLASS}.status`]: 1,
+    })
+    .select();
+};
+
+/**
+ * @name 查询每个班级的学员总数
  */
 const queryStudentTotalOfEachClassSql = (list) => {
   return sql
@@ -230,8 +299,140 @@ const queryStudentTotalOfEachClassSql = (list) => {
     .select();
 };
 
+/**
+ * @name 编辑班级名称SQL
+ * @param {Number} classId 班级id
+ * @param {String} name 班级名称
+ */
+const editClassNameSql = (data) => {
+  const { classId, name } = data;
+
+  return sql
+    .table(TABLENAME.CLASS)
+    .data({
+      name,
+    })
+    .where({
+      id: classId,
+    })
+    .update();
+};
+
+/**
+ * @name 修改班级的任课教师SQL
+ * @param {Number} classId 班级id
+ * @param {Number} teacherId 教师id
+ */
+const editTeacherForClassSql = (data) => {
+  const { classId, teacherId } = data;
+
+  return sql
+    .table(TABLENAME.TEACHERCLASS)
+    .data({
+      [toUnderline("teacherId")]: teacherId,
+    })
+    .where({
+      [toUnderline("classId")]: classId,
+    })
+    .update();
+};
+
+/**
+ * @name 查询添加的学员是否已在同课程级别下已存在SQL
+ * @param {Number} studentIds 学员id-list
+ * @param {Number} courseId 课程id
+ * @param {Number} gradeId 级别id
+ * @param {Number} classId 班级id
+ */
+const hasStudentsInSameCourseGradeSql = (data) => {
+  const { studentIds, courseId, gradeId, classId } = data;
+
+  const whereParams = Object.assign(
+    {},
+    {
+      [`${TABLENAME.CLASS}.course_id`]: courseId,
+      [`${TABLENAME.CLASS}.grade_id`]: gradeId,
+      [`${TABLENAME.STUDENTCLASS}.status`]: 1,
+      [`${TABLENAME.STUDENTCLASS}.student_id`]: {
+        in: studentIds?.join(","),
+      },
+    },
+    classId
+      ? {
+          [`${TABLENAME.STUDENTCLASS}.class_id`]: {
+            neq: classId,
+          },
+        }
+      : {},
+  );
+
+  return sql
+    .table(TABLENAME.CLASS)
+    .field([
+      `${TABLENAME.CLASS}.name AS className`,
+      `${TABLENAME.STUDENT}.id AS studentId`,
+      `${TABLENAME.STUDENT}.stu_name AS name`,
+    ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTCLASS,
+        where: {
+          [`${TABLENAME.CLASS}.id`]: [`${TABLENAME.STUDENTCLASS}.class_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENT,
+        where: {
+          [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
+        },
+      },
+    ])
+    .where(whereParams)
+    .select();
+};
+
+/**
+ * @name 查询学员在班级中是否存在未销课时SQL
+ * @param {Number} classId 班级id
+ * @param {Number} studentId 学员id
+ */
+const queryRemianCourseCountSql = (data) => {
+  const { classId, studentId } = data;
+
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .field(["remain_course_count AS remianCourseCount"])
+    .where({
+      [`${toUnderline("classId")}`]: classId,
+      [`${toUnderline("studentId")}`]: studentId,
+      status: 1,
+    })
+    .select();
+};
+
+/**
+ * @name 删除学生SQL
+ */
+const delStudentSql = (data) => {
+  const { classId, studentId } = data;
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .data({
+      status: 99,
+    })
+    .where({
+      [`${toUnderline("classId")}`]: classId,
+      [`${toUnderline("studentId")}`]: studentId,
+      status: 1,
+    })
+    .update();
+};
+
 module.exports = {
-  hasClassSql,
+  hasClassByNameSql,
+  hasClassByIdSql,
   addClassSql,
   queryClassSql,
   queryClassTotalSql,
@@ -239,4 +440,11 @@ module.exports = {
   queryClassByIdSql,
   addTeacherForClassSql,
   addStudentsForClassSql,
+  queryStudentOfEachClassSql,
+  removeStudentForClassSql,
+  editClassNameSql,
+  editTeacherForClassSql,
+  hasStudentsInSameCourseGradeSql,
+  queryRemianCourseCountSql,
+  delStudentSql,
 };

@@ -4,6 +4,7 @@ const {
   toUnderlineData,
   getQueryData,
   convertListToSelectOption,
+  handleOrder,
 } = require("../../utils/database");
 
 // 查询课程是否已新建
@@ -41,7 +42,7 @@ const batchInsertCourseGradeSql = (data, id) => {
         course_id: id,
         ...gradeItem,
       })
-      .insert()
+      .insert(),
   );
 };
 
@@ -155,6 +156,60 @@ const updateGradeInCourseSql = (data) => {
     .update();
 };
 
+// 获取课程-级别-班级信息SQL
+const getAllSubjectsSql = () => {
+  return sql
+    .table(TABLENAME.COURSE)
+    .field([
+      `${TABLENAME.COURSE}.id AS courseId`,
+      `${TABLENAME.COURSE}.name AS courseName`,
+      `${TABLENAME.COURSEGRADE}.id AS gradeId`,
+      `${TABLENAME.COURSEGRADE}.name AS gradeName`,
+      `IFNULL(${TABLENAME.CLASS}.id, "") AS classId`,
+      `IFNULL(${TABLENAME.CLASS}.name, "") AS className`,
+    ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.COURSEGRADE,
+        where: [
+          {
+            [`${TABLENAME.COURSEGRADE}.course_id`]: [`${TABLENAME.COURSE}.id`],
+          },
+        ],
+      },
+      {
+        dir: "left",
+        table: TABLENAME.CLASS,
+        where: [
+          {
+            [`${TABLENAME.COURSE}.id`]: [`${TABLENAME.CLASS}.course_id`],
+          },
+          {
+            [`${TABLENAME.COURSEGRADE}.id`]: [`${TABLENAME.CLASS}.grade_id`],
+          },
+        ],
+      },
+    ])
+    .where({
+      [`${TABLENAME.COURSE}.status`]: 1,
+      [`${TABLENAME.COURSEGRADE}.status`]: 1,
+    })
+    .order(
+      handleOrder([
+        {
+          column: `${TABLENAME.COURSE}.id`,
+          sort: "ASC",
+        },
+        {
+          column: `${TABLENAME.COURSEGRADE}.id`,
+          sort: "ASC",
+        },
+      ]),
+    )
+    .select();
+};
+
 module.exports = {
   hasCourseSql,
   insertCourseSql,
@@ -170,4 +225,5 @@ module.exports = {
   delGradeSql,
   hasGradeInCourse,
   updateGradeInCourseSql,
+  getAllSubjectsSql,
 };

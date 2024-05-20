@@ -23,6 +23,7 @@ const queryTeacherListSql = (data) => {
     .field([
       `${TABLENAME.TEACHER}.id`,
       `${TABLENAME.TEACHER}.status`,
+      `${TABLENAME.TEACHER}.course_id AS courseId`,
       `${convertIfNull("birthDate")}`,
       `${convertIfNull("phoneNumber")}`,
       `${convertIfNull("teaName")}`,
@@ -83,7 +84,7 @@ const removeTeacherSql = (data) => {
             status: 99,
           })
           .where({ id })
-          .update()
+          .update(),
       )
     : [
         sql
@@ -130,7 +131,7 @@ const searchTeacherWithCourseSql = (data) => {
 const searchTeacherByNameSql = (data) => {
   const { teaName } = data;
   return sql
-    .tablle(TABLENAME.TEACHER)
+    .table(TABLENAME.TEACHER)
     .field(convertListToSelectOption(["id", `tea_name`]))
     .where({
       status: 1,

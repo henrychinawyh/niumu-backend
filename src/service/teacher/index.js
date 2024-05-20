@@ -6,6 +6,8 @@ const {
   editSql,
   exportTeaSql,
   searchTeacherWithCourseSql,
+  removeTeacherSql,
+  searchTeacherByNameSql,
 } = require("./sql");
 
 // 新建教师
@@ -76,14 +78,12 @@ const searchTeacherWithCourse = async (data) => {
     const res = await exec(searchTeacherWithCourseSql(data));
 
     return {
-      data: {
-        list: res,
-      },
+      data: res,
     };
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage,
+      message: err.sqlMessage,
     };
   }
 };
@@ -91,12 +91,10 @@ const searchTeacherWithCourse = async (data) => {
 // 根据输入的教师名称查询教师
 const searchTeacherByName = async (data) => {
   try {
-    const res = await exec(searchTeacherWithCourseSql(data));
+    const res = await exec(searchTeacherByNameSql(data));
 
     return {
-      data: {
-        list: res,
-      },
+      data: res,
     };
   } catch (err) {
     console.log(err);

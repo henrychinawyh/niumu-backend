@@ -9,15 +9,15 @@ class AdminController {
    * @param {*} ctx
    * @param {*} next
    */
-  async register(ctx) {
+  register = async (ctx) => {
     const { username, password } = ctx.request.body;
 
     const res = await createAdmin({ username, password });
 
     commonResult(ctx, res);
-  }
+  };
 
-  async login(ctx) {
+  login = async (ctx) => {
     const res = ctx.response.body;
     const admin = res[0];
 
@@ -30,12 +30,12 @@ class AdminController {
       ctx.cookies.set(
         "token",
         encodeURIComponent(
-          `${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`
+          `${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`,
         ),
         {
           expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "strict",
-        }
+        },
       );
 
       commonResult(ctx, {
@@ -45,10 +45,10 @@ class AdminController {
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   // 改变密码
-  async changePassword(ctx) {
+  changePassword = async (ctx) => {
     // 1. 获取数据
     const id = ctx.state.admin.id;
     const password = ctx.request.body.password;
@@ -72,9 +72,9 @@ class AdminController {
         message: `密码更新失败：${err}`,
       });
     }
-  }
+  };
 
-  async getCurrentUser(ctx) {
+  getCurrentUser = async (ctx) => {
     const username = decodeURIComponent(ctx.cookies.get("username"));
 
     try {
@@ -88,7 +88,7 @@ class AdminController {
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 }
 
 module.exports = new AdminController();

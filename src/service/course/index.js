@@ -5,6 +5,7 @@ const {
   toUnderlineData,
   getQueryData,
   convertListToSelectOption,
+  compareArrayWithMin,
 } = require("../../utils/database");
 const {
   hasCourseSql,
@@ -19,9 +20,10 @@ const {
   editSql,
   getGradeSql,
   delGradeSql,
-  hasGradeInCourse,
   updateGradeInCourseSql,
   getAllSubjectsSql,
+  queryCourseStuTotalSql,
+  queryGradeStuTotalSql,
 } = require("./sql");
 
 // 添加课程
@@ -77,9 +79,16 @@ const queryCourseList = async (data) => {
     const res = await transaction([
       queryCourseListSql(data),
       queryCourseListTotalSql(data),
+      queryCourseStuTotalSql(data),
     ]);
 
-    const [list, total] = res || [];
+    const [list, total, stuTotal] = res || [];
+
+    if (Array.isArray(list) && list.length) {
+      list.forEach((item, index) => {
+        item.courseStuTotal = stuTotal?.[index]?.total || 0;
+      });
+    }
 
     return {
       data: {
@@ -119,8 +128,6 @@ const delCourse = async (data) => {
       // 删除课程下所有的级别
       removeCourseGradeSql(data),
     ]);
-    // todo 删除所有课程下的班级
-    // todo 删除所有班级下绑定的学员
     return {
       message: "删除成功",
     };
@@ -152,13 +159,46 @@ const edit = async (data) => {
 // 获取课程下所有的级别
 const getGrade = async (data) => {
   try {
-    const res = await exec(getGradeSql(data));
+    const res = await transaction([
+      getGradeSql(data),
+      queryGradeStuTotalSql(data),
+    ]);
+
+    const [grades, stuTotal] = res || [];
+
+    if (compareArrayWithMin(grades)) {
+      grades.forEach((item, index) => {
+        item.gradeStuTotal =
+          stuTotal?.filter((stu) => stu.gradeId === item.value)?.[0]?.total ||
+          0;
+      });
+    }
 
     return {
       data: {
-        list: res,
+        list: grades,
         total: res?.length || 0,
       },
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage || err,
+    };
+  }
+};
+
+// 增加课程的级别
+const addGrade = async (data) => {
+  try {
+    await transaction(
+      batchInsertCourseGradeSql({ grades: data?.grades }, data?.courseId),
+    );
+
+    return {
+      status: 200,
+      message: "操作成功",
+      data: true,
     };
   } catch (err) {
     return {
@@ -172,13 +212,14 @@ const getGrade = async (data) => {
 const delGrade = async (data) => {
   try {
     // 删除级别
-    await transaction([delGradeSql(data)]);
+    const res = await exec(delGradeSql(data));
 
-    // todo 删除级别下的班级
-    // todo 删除级别下的班级以及班级里的学员
+    const isSuccess = res?.affectedRows > 0;
 
     return {
-      message: "操作成功",
+      status: isSuccess ? 200 : 500,
+      data: true,
+      message: isSuccess ? "操作成功" : "删除失败",
     };
   } catch (err) {
     return {
@@ -190,19 +231,7 @@ const delGrade = async (data) => {
 
 // 编辑课程级别的名称
 const editGrade = async (data) => {
-  const { name } = data || {};
-
   try {
-    // 查询是否有重名的级别名称
-    const res = await exec(hasGradeInCourse(data));
-
-    if (Array.isArray(res) && res.some((item) => item.name === name)) {
-      return {
-        status: 500,
-        message: "该课程级别名称已存在，请重新命名",
-      };
-    }
-
     // 更新级别名称
     await exec(updateGradeInCourseSql(data));
 
@@ -246,4 +275,5 @@ module.exports = {
   editGrade,
   getAllCourses,
   getAllSubjects,
+  addGrade,
 };

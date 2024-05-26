@@ -5,6 +5,7 @@ const {
   editClassByClassId,
   queryRemianCourseCount,
   delStudent,
+  delClass,
 } = require("../../service/class");
 const { commonResult, commonServerWrongResult } = require("../common");
 
@@ -69,6 +70,16 @@ class ClassController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `删除班级下的学员失败：${err}`);
+    }
+  }
+
+  // 删除班级
+  async deleteClass(ctx, next) {
+    try {
+      const res = await delClass(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `删除班级失败：${err}`);
     }
   }
 }

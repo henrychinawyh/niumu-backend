@@ -1,0 +1,230 @@
+{
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/sql/users.sql": {
+    "language": "SQL",
+    "code": 13,
+    "comment": 0,
+    "blank": 0
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/student.js": {
+    "language": "JavaScript",
+    "code": 19,
+    "comment": 6,
+    "blank": 9
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/admin.js": {
+    "language": "JavaScript",
+    "code": 22,
+    "comment": 5,
+    "blank": 8
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/class.js": {
+    "language": "JavaScript",
+    "code": 38,
+    "comment": 7,
+    "blank": 10
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/teacher.js": {
+    "language": "JavaScript",
+    "code": 21,
+    "comment": 7,
+    "blank": 10
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/index.js": {
+    "language": "JavaScript",
+    "code": 12,
+    "comment": 0,
+    "blank": 3
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/routes/course.js": {
+    "language": "JavaScript",
+    "code": 34,
+    "comment": 11,
+    "blank": 14
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/sql/temp.sql": {
+    "language": "SQL",
+    "code": 141,
+    "comment": 4,
+    "blank": 14
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/teacher/sql.js": {
+    "language": "JavaScript",
+    "code": 149,
+    "comment": 9,
+    "blank": 15
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/user/index.js": {
+    "language": "JavaScript",
+    "code": 0,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/teacher/index.js": {
+    "language": "JavaScript",
+    "code": 90,
+    "comment": 7,
+    "blank": 16
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/class/index.js": {
+    "language": "JavaScript",
+    "code": 208,
+    "comment": 49,
+    "blank": 32
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/class/sql.js": {
+    "language": "JavaScript",
+    "code": 394,
+    "comment": 75,
+    "blank": 37
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/student/sql.js": {
+    "language": "JavaScript",
+    "code": 107,
+    "comment": 7,
+    "blank": 12
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/admin/index.js": {
+    "language": "JavaScript",
+    "code": 53,
+    "comment": 3,
+    "blank": 8
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/course/sql.js": {
+    "language": "JavaScript",
+    "code": 283,
+    "comment": 27,
+    "blank": 29
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/course/index.js": {
+    "language": "JavaScript",
+    "code": 230,
+    "comment": 18,
+    "blank": 32
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/utils/index.js": {
+    "language": "JavaScript",
+    "code": 42,
+    "comment": 2,
+    "blank": 9
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/db/seq.js": {
+    "language": "JavaScript",
+    "code": 14,
+    "comment": 0,
+    "blank": 4
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/utils/export.js": {
+    "language": "JavaScript",
+    "code": 48,
+    "comment": 9,
+    "blank": 8
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/utils/database.js": {
+    "language": "JavaScript",
+    "code": 115,
+    "comment": 16,
+    "blank": 16
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/config/config.default.js": {
+    "language": "JavaScript",
+    "code": 3,
+    "comment": 1,
+    "blank": 4
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/service/student/index.js": {
+    "language": "JavaScript",
+    "code": 75,
+    "comment": 6,
+    "blank": 12
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/utils/constant.js": {
+    "language": "JavaScript",
+    "code": 32,
+    "comment": 3,
+    "blank": 4
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/main.js": {
+    "language": "JavaScript",
+    "code": 5,
+    "comment": 0,
+    "blank": 2
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/teacher/index.js": {
+    "language": "JavaScript",
+    "code": 118,
+    "comment": 7,
+    "blank": 17
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/common.js": {
+    "language": "JavaScript",
+    "code": 27,
+    "comment": 0,
+    "blank": 6
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/class/index.js": {
+    "language": "JavaScript",
+    "code": 69,
+    "comment": 7,
+    "blank": 12
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/app/index.js": {
+    "language": "JavaScript",
+    "code": 8,
+    "comment": 2,
+    "blank": 6
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/admin/index.js": {
+    "language": "JavaScript",
+    "code": 72,
+    "comment": 10,
+    "blank": 13
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/student/index.js": {
+    "language": "JavaScript",
+    "code": 113,
+    "comment": 6,
+    "blank": 15
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/controlller/course/index.js": {
+    "language": "JavaScript",
+    "code": 96,
+    "comment": 10,
+    "blank": 18
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/course.middleware.js": {
+    "language": "JavaScript",
+    "code": 55,
+    "comment": 2,
+    "blank": 9
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/student.middleware.js": {
+    "language": "JavaScript",
+    "code": 0,
+    "comment": 0,
+    "blank": 1
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/auth.middleware.js": {
+    "language": "JavaScript",
+    "code": 30,
+    "comment": 1,
+    "blank": 3
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/class.middleware.js": {
+    "language": "JavaScript",
+    "code": 39,
+    "comment": 2,
+    "blank": 13
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/admin.middleware.js": {
+    "language": "JavaScript",
+    "code": 69,
+    "comment": 4,
+    "blank": 17
+  },
+  "file:///Users/wangyuhang/Desktop/mypro/niumu-backend/src/middleware/studentClass.middleware.js": {
+    "language": "JavaScript",
+    "code": 22,
+    "comment": 1,
+    "blank": 7
+  }
+}

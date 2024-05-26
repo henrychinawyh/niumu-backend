@@ -92,7 +92,7 @@ const addStudentsForClassSql = (data) => {
 };
 
 /**
- * @name 将学生与当前班级的关系解绑(从班级中删除学生)
+ * @name 将学生与当前班级的关系解绑(从班级中删除多个学生)
  */
 const removeStudentForClassSql = (data) => {
   const { classId, list } = data;
@@ -107,21 +107,27 @@ const removeStudentForClassSql = (data) => {
       [toUnderline("studentId")]: {
         in: list?.join(","),
       },
+      status: 1,
     })
     .update();
 };
 
 /**
- * @name 根据班级id查询班级信息
+ * @name 删除单个学生SQL
  */
-const queryClassByIdSql = (data) => {
-  const { gradeId, name } = data;
-
+const delStudentSql = (data) => {
+  const { classId, studentId } = data;
   return sql
-    .table(TABLENAME.CLASS)
-    .field(["id"])
-    .where({ name, [toUnderline("gradeId")]: gradeId })
-    .select();
+    .table(TABLENAME.STUDENTCLASS)
+    .data({
+      status: 99,
+    })
+    .where({
+      [`${toUnderline("classId")}`]: classId,
+      [`${toUnderline("studentId")}`]: studentId,
+      status: 1,
+    })
+    .update();
 };
 
 /**
@@ -132,7 +138,26 @@ const queryClassByIdSql = (data) => {
  * @params {Number} teaName 教师名称
  */
 const queryClassSql = (data) => {
-  const { current, pageSize } = data || {};
+  const { current, pageSize, courseId, gradeId, classId, teacherName } =
+    data || {};
+
+  const whereParams = {
+    [`${TABLENAME.CLASS}.status`]: 1,
+  };
+
+  // 判断条件
+  if (courseId) {
+    whereParams[`${TABLENAME.COURSE}.id`] = courseId;
+  }
+  if (gradeId) {
+    whereParams[`${TABLENAME.COURSEGRADE}.id`] = gradeId;
+  }
+  if (classId) {
+    whereParams[`${TABLENAME.CLASS}.id`] = classId;
+  }
+  if (teacherName) {
+    whereParams[`${TABLENAME.TEACHER}.tea_name`] = teacherName;
+  }
 
   return sql
     .table(TABLENAME.CLASS)
@@ -178,19 +203,7 @@ const queryClassSql = (data) => {
       },
     ])
     .page(current, pageSize)
-    .where({
-      ...toUnderlineData(
-        convertJoinWhere(getQueryData({ ...data, status: 1 }), {
-          status: TABLENAME.CLASS,
-          createTs: TABLENAME.CLASS,
-          courseId: `${TABLENAME.COURSE}.id`,
-          classId: `${TABLENAME.CLASS}.id`,
-          gradeId: `${TABLENAME.COURSEGRADE}.id`,
-          name: TABLENAME.CLASS,
-          teaName: TABLENAME.TEACHER,
-        }),
-      ),
-    })
+    .where(whereParams)
     .select();
 };
 
@@ -198,6 +211,26 @@ const queryClassSql = (data) => {
  * @name 查询班级列表总数
  */
 const queryClassTotalSql = (data) => {
+  const { courseId, gradeId, classId, teacherName } = data;
+
+  const whereParams = {
+    [`${TABLENAME.CLASS}.status`]: 1,
+  };
+
+  // 判断条件
+  if (courseId) {
+    whereParams[`${TABLENAME.COURSE}.id`] = courseId;
+  }
+  if (gradeId) {
+    whereParams[`${TABLENAME.COURSEGRADE}.id`] = gradeId;
+  }
+  if (classId) {
+    whereParams[`${TABLENAME.CLASS}.id`] = classId;
+  }
+  if (teacherName) {
+    whereParams[`${TABLENAME.TEACHER}.tea_name`] = teacherName;
+  }
+
   return sql
     .table(TABLENAME.CLASS)
     .field([`count(*) AS total`])
@@ -231,19 +264,7 @@ const queryClassTotalSql = (data) => {
         },
       },
     ])
-    .where({
-      ...toUnderlineData(
-        convertJoinWhere(getQueryData({ ...data, status: 1 }), {
-          status: TABLENAME.CLASS,
-          createTs: TABLENAME.CLASS,
-          courseId: `${TABLENAME.COURSE}.id`,
-          classId: `${TABLENAME.CLASS}.id`,
-          gradeId: `${TABLENAME.COURSEGRADE}.id`,
-          name: TABLENAME.CLASS,
-          teaName: TABLENAME.TEACHER,
-        }),
-      ),
-    })
+    .where(whereParams)
     .select();
 };
 
@@ -257,12 +278,14 @@ const queryStudentOfEachClassSql = (data) => {
   return sql
     .table(TABLENAME.STUDENTCLASS)
     .field([
-      `${TABLENAME.STUDENT}.id AS id`,
+      `${TABLENAME.STUDENTCLASS}.id AS id`,
+      `${TABLENAME.STUDENT}.id AS studentId`,
       `${TABLENAME.STUDENT}.stu_name AS name`,
       `${TABLENAME.STUDENT}.birth_date AS birthDate`,
       `${TABLENAME.STUDENT}.sex AS sex`,
       `${TABLENAME.STUDENTCLASS}.class_id AS classId`,
-      `${TABLENAME.STUDENTCLASS}.remain_course_count AS remainCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS payId`,
     ])
     .join([
       {
@@ -270,6 +293,15 @@ const queryStudentOfEachClassSql = (data) => {
         table: TABLENAME.STUDENT,
         where: {
           [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTPAYCLASSRECORD,
+        where: {
+          [`${TABLENAME.STUDENTCLASS}.id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
+          ],
         },
       },
     ])
@@ -399,32 +431,44 @@ const hasStudentsInSameCourseGradeSql = (data) => {
  * @param {Number} studentId 学员id
  */
 const queryRemianCourseCountSql = (data) => {
-  const { classId, studentId } = data;
+  const { id } = data;
 
   return sql
-    .table(TABLENAME.STUDENTCLASS)
+    .table(TABLENAME.STUDENTPAYCLASSRECORD)
     .field(["remain_course_count AS remianCourseCount"])
     .where({
-      [`${toUnderline("classId")}`]: classId,
-      [`${toUnderline("studentId")}`]: studentId,
+      id,
       status: 1,
     })
     .select();
 };
 
 /**
- * @name 删除学生SQL
+ * @name 根据班级id查询班级信息
  */
-const delStudentSql = (data) => {
-  const { classId, studentId } = data;
+const queryClassByIdSql = (data) => {
+  const { gradeId, name } = data;
+
   return sql
-    .table(TABLENAME.STUDENTCLASS)
+    .table(TABLENAME.CLASS)
+    .field(["id"])
+    .where({ name, [toUnderline("gradeId")]: gradeId })
+    .select();
+};
+
+/**
+ * @name 删除班级
+ */
+const delClassSql = (data) => {
+  const { id } = data;
+
+  return sql
+    .table(TABLENAME.CLASS)
     .data({
       status: 99,
     })
     .where({
-      [`${toUnderline("classId")}`]: classId,
-      [`${toUnderline("studentId")}`]: studentId,
+      id,
       status: 1,
     })
     .update();
@@ -447,4 +491,5 @@ module.exports = {
   hasStudentsInSameCourseGradeSql,
   queryRemianCourseCountSql,
   delStudentSql,
+  delClassSql,
 };

@@ -47,6 +47,13 @@ const transformData = (data, showLayer = 3) => {
   return result;
 };
 
+// 精确计算保留N位小数
+const toFixed = (num, digits) => {
+  const factor = Math.pow(10, digits);
+  return Math.round((num + Number.EPSILON) * factor) / factor;
+};
+
 module.exports = {
   transformData,
+  toFixed,
 };

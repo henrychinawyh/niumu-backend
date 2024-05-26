@@ -9,6 +9,7 @@ const {
   editGrade,
   getAllCourses,
   getAllSubjects,
+  addGrade,
 } = require("../../service/course");
 
 class CourseController {
@@ -73,6 +74,16 @@ class CourseController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `获取课程级别失败：${err}`);
+    }
+  }
+
+  // 新增课程的级别
+  async addCourseGrade(ctx, next) {
+    try {
+      const res = await addGrade(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `新增课程级别失败：${err}`);
     }
   }
 

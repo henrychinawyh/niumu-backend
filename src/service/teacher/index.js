@@ -8,6 +8,7 @@ const {
   searchTeacherWithCourseSql,
   removeTeacherSql,
   searchTeacherByNameSql,
+  queryTeacherByClassIdSql,
 } = require("./sql");
 
 // 新建教师
@@ -17,7 +18,10 @@ const addTeacher = async (data) => {
 
     return res;
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
   }
 };
 
@@ -37,7 +41,10 @@ const queryTeacher = async (data) => {
       pageSize,
     };
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
   }
 };
 
@@ -47,7 +54,10 @@ const edit = async (data) => {
     const res = await exec(editSql(data));
     return res;
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
   }
 };
 
@@ -68,7 +78,10 @@ const exportTea = async (data) => {
 
     return res;
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
   }
 };
 
@@ -83,7 +96,7 @@ const searchTeacherWithCourse = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err.sqlMessage,
+      message: err.sqlMessage || err,
     };
   }
 };
@@ -97,7 +110,26 @@ const searchTeacherByName = async (data) => {
       data: res,
     };
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
+  }
+};
+
+// 根据班级id，查询班级的任课教师
+const queryTeacherByClassId = async (data) => {
+  try {
+    const res = await exec(queryTeacherByClassIdSql(data));
+
+    return {
+      data: res,
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
   }
 };
 
@@ -109,4 +141,5 @@ module.exports = {
   exportTea,
   searchTeacherWithCourse,
   searchTeacherByName,
+  queryTeacherByClassId,
 };

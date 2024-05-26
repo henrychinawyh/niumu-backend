@@ -5,6 +5,8 @@ const {
   getQueryData,
   convertListToSelectOption,
   handleOrder,
+  toUnderline,
+  handleGroupBy,
 } = require("../../utils/database");
 
 // 查询课程是否已新建
@@ -73,11 +75,91 @@ const queryCourseListTotalSql = (data) => {
     .select();
 };
 
+/**
+ * @name 查询课程下所有的学员人数
+ *
+ */
+const queryCourseStuTotalSql = (data) => {
+  const { current = 1, pageSize = 10, name } = data;
+
+  const whereParams = Object.assign(
+    {},
+    {
+      [`${TABLENAME.COURSE}.status`]: 1,
+      [`${TABLENAME.STUDENTCLASS}.id`]: { gt: 0 },
+    },
+    name ? { [`${TABLENAME.COURSE}.name`]: name } : {},
+  );
+
+  return sql
+    .table(TABLENAME.COURSE)
+    .field(["count(*) AS total"])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.CLASS,
+        where: {
+          [`${TABLENAME.COURSE}.id`]: [`${TABLENAME.CLASS}.course_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTCLASS,
+        where: {
+          [`${TABLENAME.CLASS}.id`]: [`${TABLENAME.STUDENTCLASS}.class_id`],
+        },
+      },
+    ])
+    .page(current, pageSize)
+    .where(whereParams)
+    .group(`${TABLENAME.COURSE}.id`)
+    .select();
+};
+
 // 查询所有课程SQL
 const getAllCoursesSql = () => {
   return sql
     .table(TABLENAME.COURSE)
     .field(convertListToSelectOption(["id", "name"]))
+    .select();
+};
+
+/**
+ * @name 查询某个课程的级别下所有的学员人数
+ */
+const queryGradeStuTotalSql = (data) => {
+  const { courseId } = data;
+
+  return sql
+    .table(TABLENAME.COURSEGRADE)
+    .field(["count(*) AS total", `${TABLENAME.COURSEGRADE}.id as gradeId`])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.CLASS,
+        where: {
+          [`${TABLENAME.COURSEGRADE}.id`]: [`${TABLENAME.CLASS}.grade_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTCLASS,
+        where: {
+          [`${TABLENAME.CLASS}.id`]: [`${TABLENAME.STUDENTCLASS}.class_id`],
+        },
+      },
+    ])
+    .where({
+      [`${TABLENAME.COURSEGRADE}.course_id`]: courseId,
+      [`${TABLENAME.COURSEGRADE}.status`]: 1,
+      [`${TABLENAME.STUDENTCLASS}.id`]: { gt: 0 },
+    })
+    .group(
+      handleGroupBy([
+        `${TABLENAME.COURSEGRADE}.id`,
+        `${TABLENAME.COURSEGRADE}.course_id`,
+      ]),
+    )
     .select();
 };
 
@@ -134,25 +216,13 @@ const delGradeSql = (data) => {
     .update();
 };
 
-// 查询是否有重名的级别名称SQL
-const hasGradeInCourse = (data) => {
-  return sql
-    .table(TABLENAME.COURSEGRADE)
-    .field(["name"])
-    .where({
-      ...toUnderlineData(data),
-      status: 1,
-    })
-    .select();
-};
-
 // 更新课程下的级别名称SQL
 const updateGradeInCourseSql = (data) => {
-  const { name, courseId } = data || {};
+  const { name, id } = data || {};
   return sql
     .table(TABLENAME.COURSEGRADE)
     .data({ name })
-    .where({ id: courseId, status: 1 })
+    .where({ id, status: 1 })
     .update();
 };
 
@@ -210,6 +280,42 @@ const getAllSubjectsSql = () => {
     .select();
 };
 
+/**
+ * @name 检查同课程下是否已经存在同名的级别
+ */
+const queryGradeNameUnderCourseSql = (data) => {
+  const { courseId, name } = data;
+
+  return sql
+    .table(TABLENAME.COURSEGRADE)
+    .where({
+      [`${toUnderline("courseId")}`]: courseId,
+      name,
+      status: 1,
+    })
+    .select();
+};
+
+/**
+ * @name 检查同课程下是否已经存在同名的级别（集合）
+ */
+const queryGradeNamesUnderCourseSql = (data) => {
+  const { courseId, grades } = data;
+
+  console.log(data, "data");
+
+  return sql
+    .table(TABLENAME.COURSEGRADE)
+    .where({
+      [`${toUnderline("courseId")}`]: courseId,
+      name: {
+        in: grades?.map((item) => `"${item.name}"`).join(","),
+      },
+      status: 1,
+    })
+    .select();
+};
+
 module.exports = {
   hasCourseSql,
   insertCourseSql,
@@ -223,7 +329,10 @@ module.exports = {
   editSql,
   getGradeSql,
   delGradeSql,
-  hasGradeInCourse,
   updateGradeInCourseSql,
   getAllSubjectsSql,
+  queryGradeNameUnderCourseSql,
+  queryGradeNamesUnderCourseSql,
+  queryCourseStuTotalSql,
+  queryGradeStuTotalSql,
 };

@@ -142,6 +142,48 @@ const searchTeacherByNameSql = (data) => {
     .select();
 };
 
+// 根据班级id，删除教师
+const delTeacherForClassSql = (data) => {
+  const { teacherId, id } = data;
+
+  return sql
+    .table(TABLENAME.TEACHERCLASS)
+    .data({
+      status: 99,
+    })
+    .where({
+      [toUnderline("teacherId")]: teacherId,
+      [toUnderline("classId")]: id,
+      status: 1,
+    })
+    .update();
+};
+
+// 根据班级id，查询班级的任课教师
+const queryTeacherByClassIdSql = (data) => {
+  const { classId } = data;
+
+  return sql
+    .table(TABLENAME.TEACHER)
+    .field([
+      `${TABLENAME.TEACHER}.id as teacherId`,
+      `${TABLENAME.TEACHER}.tea_name as teacherName`,
+      `${TABLENAME.TEACHERCLASS}.class_id as classId`,
+    ])
+    .join({
+      dir: "left",
+      table: TABLENAME.TEACHERCLASS,
+      where: {
+        [`${TABLENAME.TEACHERCLASS}.teacher_id`]: [`${TABLENAME.TEACHER}.id`],
+        [`${TABLENAME.TEACHER}.status`]: 1,
+      },
+    })
+    .where({
+      [`${TABLENAME.TEACHERCLASS}.class_id`]: classId,
+    })
+    .select();
+};
+
 module.exports = {
   addTeacherSql,
   queryTeacherListSql,
@@ -151,4 +193,6 @@ module.exports = {
   exportTeaSql,
   searchTeacherWithCourseSql,
   searchTeacherByNameSql,
+  delTeacherForClassSql,
+  queryTeacherByClassIdSql,
 };

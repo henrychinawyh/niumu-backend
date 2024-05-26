@@ -1,7 +1,7 @@
 const { diff } = require("radash");
-const { exec, transaction } = require("../../db/seq");
-const { EMPTY_DATA } = require("../../utils/constant");
-const { compareArrayWithMin } = require("../../utils/database");
+const { exec, transaction, sql } = require("../../db/seq");
+const { EMPTY_DATA, TABLENAME } = require("../../utils/constant");
+const { compareArrayWithMin, toUnderline } = require("../../utils/database");
 const {
   addClassSql,
   queryClassSql,
@@ -15,7 +15,9 @@ const {
   editTeacherForClassSql,
   queryRemianCourseCountSql,
   delStudentSql,
+  delClassSql,
 } = require("./sql");
+const { delTeacherForClassSql } = require("../teacher/sql");
 
 /**
  * @name 查询添加的学员是否已在同课程同级别下的班级已存在
@@ -105,13 +107,25 @@ const getClass = async (data) => {
 
         const students = (studentList || [])
           ?.filter((student) => student?.classId === classId)
-          ?.map(({ id, name, birthDate, sex, remainCourseCount }) => ({
-            id,
-            name,
-            birthDate,
-            sex,
-            remainCourseCount,
-          }));
+          ?.map(
+            ({
+              id,
+              name,
+              birthDate,
+              sex,
+              remainCourseCount = 0,
+              studentId,
+              payId,
+            }) => ({
+              id,
+              name,
+              birthDate,
+              sex,
+              remainCourseCount: remainCourseCount ?? 0,
+              studentId,
+              payId,
+            }),
+          );
 
         item.studentList = students;
         item.total = students?.length;
@@ -252,6 +266,28 @@ const delStudent = async (data) => {
   }
 };
 
+// 删除班级
+const delClass = async (data) => {
+  try {
+    const res = await transaction([
+      delClassSql(data),
+      delTeacherForClassSql(data),
+    ]);
+    const isSuccess = res?.[0]?.affectedRows > 0;
+
+    return {
+      status: isSuccess ? 200 : 500,
+      data: isSuccess,
+      message: isSuccess ? "删除成功" : "删除失败",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err?.sqlMessage || err,
+    };
+  }
+};
+
 module.exports = {
   addClass,
   getClass,
@@ -259,4 +295,5 @@ module.exports = {
   editClassByClassId,
   queryRemianCourseCount,
   delStudent,
+  delClass,
 };

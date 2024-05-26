@@ -82,11 +82,9 @@ create table class
 
 create table student_class
 (
-    id                  bigint primary key auto_increment not null comment '',
+    id                  bigint primary key auto_increment not null comment '学员关联班级id',
     student_id          bigint                            not null comment '学生id',
-    class_id            bigint                            not null comment 'class#id',
-    total_course_count  int                               not null comment '总的课程次数',
-    remain_course_count int                               not null comment '剩余课程次数',
+    class_id            bigint                            not null comment '班级id',
     status              int                               not null default 1 comment '1 有效 99 删除',
     create_ts           timestamp                         not null default current_timestamp,
     update_ts           timestamp                         not null default current_timestamp on update current_timestamp,
@@ -97,12 +95,12 @@ create table student_class
 create table student_pay_class_record
 (
     id                  bigint primary key auto_increment not null comment '学生支付课程记录id',
-    student_class_id    bigint                            not null comment '学生班级id',
-    student_id          bigint                            not null comment '学生id',
-    class_id            bigint                            not null comment '班级id',
-    payment             decimal(10, 2)                    not null comment '缴费金额',
+    student_class_id    bigint                            not null comment '学生关联班级id',
     paid_course_count   int                               not null comment '购买课程次数',
+    payment             decimal(10, 2)                    not null comment '缴费金额',
+    real_price          decimal(10, 2)                    not null comment '实际单价',
     remain_course_count int                               not null comment '剩余课程次数',
+    remain_cost         decimal(10, 2)                    not null comment '剩余课销金额'
     status              int                               not null default 1 comment '1 有效 99 删除',
     create_ts           timestamp                         not null default current_timestamp,
     update_ts           timestamp                         not null default current_timestamp on update current_timestamp,
@@ -112,10 +110,11 @@ create table student_pay_class_record
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
 ) comment '学生购买班级课程记录';
+    -- remain_course_count int                               not null comment '剩余课程次数',
     -- record_status       int                               not null default 1 comment '1 购买成功 2 已完结',
     -- member              int                               not null default 0 comment '0 非会员 1会员',
     -- origin_price        decimal(10, 2)                    not null comment '原单价',
-    -- real_price          decimal(10, 2)                    not null comment '实际单价',
+
 
 
 create table student_attend_course_record
@@ -123,7 +122,7 @@ create table student_attend_course_record
     id               bigint primary key auto_increment not null comment '学生上课时间记录id',
     student_class_id bigint                            not null comment '学生关联班级id',
     student_id       bigint                            not null comment '学生id',
-    class_id         bigint                            not null comment 'class#id',
+    class_id         bigint                            not null comment '班级id',
     attend_date      date                              not null comment '上课时间',
     status           int                               not null default 1 comment '1 有效 99 删除',
     create_ts        timestamp                         not null default current_timestamp,

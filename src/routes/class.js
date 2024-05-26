@@ -6,9 +6,11 @@ const {
   editClass,
   hasRemianCourseCount,
   deleteStudentOfClass,
+  deleteClass,
 } = require("../controlller/class");
 const {
   hasClassNameUnderCourseGrade,
+  hasClass,
 } = require("../middleware/class.middleware");
 const {
   hasStudentsInSameCourseGrade,
@@ -45,5 +47,8 @@ router.post("/hasRemianCourseCount", hasRemianCourseCount);
 
 // 删除班级下的学员
 router.post("/deleteStudentOfClass", deleteStudentOfClass);
+
+// 删除班级
+router.post("/deleteClass", hasClass, deleteClass);
 
 module.exports = router;

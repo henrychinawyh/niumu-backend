@@ -7,6 +7,7 @@ const {
   exportTeacher,
   queryTeacherWithCourse,
   queryTeacherByName,
+  getTeacherByClassId,
 } = require("../controlller/teacher");
 
 const router = new Router({
@@ -33,5 +34,8 @@ router.post("/queryTeacherWithCourse", queryTeacherWithCourse);
 
 // 根据输入的教师名查询教师
 router.post("/queryTeacherByName", queryTeacherByName);
+
+// 根据班级id，查询班级的任课教师
+router.post("/getTeacherByClassId", getTeacherByClassId);
 
 module.exports = router;

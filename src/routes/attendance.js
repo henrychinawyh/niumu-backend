@@ -3,7 +3,10 @@
  */
 
 const Router = require("koa-router");
-const { getAttendanceList } = require("../controlller/attendance");
+const {
+  getAttendanceList,
+  createAttendance,
+} = require("../controlller/attendance");
 
 const router = new Router({
   prefix: "/api/attendance",
@@ -11,5 +14,8 @@ const router = new Router({
 
 // 查询考勤列表
 router.post("/getAttendanceList", getAttendanceList);
+
+// 创建一条考勤记录
+router.post("/createAttendance", createAttendance);
 
 module.exports = router;

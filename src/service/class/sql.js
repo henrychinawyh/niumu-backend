@@ -131,6 +131,21 @@ const delStudentSql = (data) => {
 };
 
 /**
+ * @name 删除单个学生考勤SQL
+ */
+const delStudentInAttendanceSql = (data) => {
+  const { studentId } = data;
+
+  return sql
+    .table(TABLENAME.STUDENTPAYCLASSRECORD)
+    .data({ status: 99 })
+    .where({
+      [`${toUnderline("studentId")}`]: studentId,
+    })
+    .update();
+};
+
+/**
  * @name 查询班级列表
  * @params {Number} courseId 课程id
  * @params {Number} gradeId 级别id
@@ -492,4 +507,5 @@ module.exports = {
   queryRemianCourseCountSql,
   delStudentSql,
   delClassSql,
+  delStudentInAttendanceSql,
 };

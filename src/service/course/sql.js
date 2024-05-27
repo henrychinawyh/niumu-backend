@@ -275,6 +275,10 @@ const getAllSubjectsSql = () => {
           column: `${TABLENAME.COURSEGRADE}.id`,
           sort: "ASC",
         },
+        {
+          column: `${TABLENAME.CLASS}.id`,
+          sort: "ASC",
+        },
       ]),
     )
     .select();
@@ -301,8 +305,6 @@ const queryGradeNameUnderCourseSql = (data) => {
  */
 const queryGradeNamesUnderCourseSql = (data) => {
   const { courseId, grades } = data;
-
-  console.log(data, "data");
 
   return sql
     .table(TABLENAME.COURSEGRADE)

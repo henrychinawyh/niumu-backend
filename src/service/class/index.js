@@ -16,6 +16,7 @@ const {
   queryRemianCourseCountSql,
   delStudentSql,
   delClassSql,
+  delStudentInAttendanceSql,
 } = require("./sql");
 const { delTeacherForClassSql } = require("../teacher/sql");
 
@@ -246,17 +247,15 @@ const queryRemianCourseCount = async (data) => {
   }
 };
 
-// 删除班级下的学生
+// 删除班级下的学生,并且需要将学员从考勤中也删除
 const delStudent = async (data) => {
   try {
-    const res = await exec(delStudentSql(data));
-
-    const isSuccess = res?.affectedRows > 0;
+    await transaction([delStudentSql(data), delStudentInAttendanceSql(data)]);
 
     return {
-      status: isSuccess ? 200 : 500,
-      data: isSuccess,
-      message: isSuccess ? "删除成功" : "删除失败",
+      status: 200,
+      data: true,
+      message: "删除成功",
     };
   } catch (err) {
     return {

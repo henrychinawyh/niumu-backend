@@ -1,3 +1,4 @@
+const dayjs = require("dayjs");
 const { sql } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const {
@@ -22,6 +23,8 @@ const queryStudentSql = (data) => {
       'IFNULL(update_ts, "") AS updateTs',
       "sex",
       "age",
+      "school_name AS schoolName",
+      "has_cousin AS hasCousin",
     ])
     .page(current, pageSize)
     .where({ ...toUnderlineData(getQueryData(data)) })
@@ -53,9 +56,28 @@ const queryOneStudentSql = (data) => {
     .select();
 };
 
+// 根据身份证号查询学员
+const queryStudentByIdCardSql = (data) => {
+  const { idCard } = data;
+
+  return sql
+    .table(TABLENAME.STUDENT)
+    .where({
+      [toUnderline("idCard")]: idCard,
+      status: 1,
+    })
+    .select();
+};
+
 // 新建学生SQL
 const addStudentSql = (data) => {
-  return sql.table(TABLENAME.STUDENT).data(toUnderlineData(data)).insert();
+  return sql
+    .table(TABLENAME.STUDENT)
+    .data({
+      ...toUnderlineData(data),
+      age: dayjs().diff(dayjs(data.birthDate), "year"),
+    })
+    .insert();
 };
 
 // 编辑学生SQL
@@ -83,7 +105,7 @@ const removeStudentSql = (data) => {
             status: 99,
           })
           .where({ id })
-          .update()
+          .update(),
       )
     : [
         sql
@@ -122,4 +144,5 @@ module.exports = {
   editSql,
   removeStudentSql,
   exportStuSql,
+  queryStudentByIdCardSql,
 };

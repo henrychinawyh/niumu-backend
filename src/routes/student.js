@@ -7,6 +7,7 @@ const {
   getStudent,
   exportStudent,
 } = require("../controlller/student");
+const { checkSameStu } = require("../middleware/student.middleware");
 
 const router = new Router({
   prefix: "/api/students",
@@ -16,7 +17,7 @@ const router = new Router({
 router.post("/getStudentList", getStudentList);
 
 // 新建学员
-router.post("/createStudent", createStudent);
+router.post("/createStudent", checkSameStu, createStudent);
 
 // 编辑学员
 router.post("/editStudent", editStudent);

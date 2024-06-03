@@ -30,8 +30,6 @@ const hasClassNameUnderCourseGrade = async (ctx, next) => {
 
   const res = await exec(hasClassByNameSql(data));
 
-  console.log(res, data);
-
   if (
     res?.length &&
     res?.[0]?.name === data?.name &&

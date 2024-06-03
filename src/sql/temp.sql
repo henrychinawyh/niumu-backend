@@ -14,11 +14,13 @@ create table admin
 
 create table student
 (
-    id           bigint primary key auto_increment not null comment '',
+    id           bigint primary key auto_increment not null comment '学员id',
     birth_date   timestamp                         not null comment '生日',
     phone_number varchar(100)                      not null comment '联系方式，用英文逗号隔开',
+    has_cousin   varchar(20)                       comment '是否有兄弟姐妹，用英文逗号隔开 0 姐姐 1 妹妹 2 哥哥 3 弟弟',
+    school_name  varchar(50)                       comment '就读学校',
     stu_name     varchar(50)                       not null comment '学生姓名',
-    id_card      varchar(20)                       null comment '身份证号',
+    id_card      varchar(20)                       not null comment '身份证号',
     status       int                               not null default 1 comment '1 有效 99 删除',
     sex          int                               not null default 1 comment '1 男 2 女',
     create_ts    timestamp                         not null default current_timestamp,
@@ -27,6 +29,65 @@ create table student
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
 ) comment '学员表';
+
+create table family (
+    id              bigint primary key auto_increment  not null comment '家庭id',
+    family_name     varchar(20)                        not null comment '家庭名字', 
+    is_member       int                                not null default 0 comment '是否是会员 0 否 1 是',
+    account_balance decimal(10, 2)                     not null default 0 comment '账户余额',
+    main_member_id  varchar(20)                        not null comment '主要家庭成员身份证号',
+    status          int                                not null default 1 comment '1 有效 99 删除',
+    create_ts       timestamp                          not null default current_timestamp,
+    update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
+    unique idx_main_member_id (main_member_id),
+    index idx_family_name (family_name),
+    index idx_create_ts (create_ts),
+    index idx_update_ts (update_ts)
+) comment '家庭表'
+
+create table familyMember (
+    id              bigint primary key auto_increment  not null comment '家庭-成员关联id',
+    family_id       bigint                             not null comment '家庭id',
+    student_id      bigint                             not null comment '学员id',
+    status          int                                not null default 1 comment '1 有效 99 删除',
+    create_ts       timestamp                          not null default current_timestamp comment '入学时间',
+    update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
+    index idx_family_id (family_id),
+    index idx_student_id (student_id),
+    index idx_create_ts (create_ts),
+    index idx_update_ts (update_ts)
+) comment '家庭成员表'
+
+create table familyMembership (
+    id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
+    family_id       bigint                             not null comment '家庭id',
+    discount        decimal(10, 2)                     not null comment '会员折扣',
+    status          int                                not null default 1 comment '1 有效 99 删除',
+    create_ts       timestamp                          not null default current_timestamp comment '会员创建时间',
+    update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
+    index idx_family_id (family_id),
+    index idx_create_ts (create_ts),
+    index idx_update_ts (update_ts)
+) comment '家庭会员表'
+
+create table familyCostRecord (
+    id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
+    family_id       bigint                             not null comment '家庭id',
+    student_id      bigint                             not null comment '学员id',
+    cost            decimal(10, 2)                     not null comment '消费金额',
+    consume_detail  varchar(100)                       not null comment '消费详情',  
+    is_discount     int                                not null default 0 comment '是否折扣 0 否 1 是',
+    discount        decimal(10, 2)                     not null default 0 comment '折扣',
+    origin_price    decimal(10, 2)                     not null comment '应收价格',
+    actual_price    decimal(10, 2)                     not null comment '实收价格',
+    status          int                                not null default 1 comment '1 有效 99 删除',
+    create_ts       timestamp                          not null default current_timestamp comment '消费时间',
+    update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
+    index idx_family_id (family_id),
+    index idx_student_id (student_id),
+    index idx_create_ts (create_ts),
+    index idx_update_ts (update_ts)
+) comment '家庭费用记录表'
 
 create table teacher
 (
@@ -57,12 +118,15 @@ create table course
 
 create table course_grade
 (
-    id        bigint primary key auto_increment not null comment '级别id',
-    course_id bigint                            not null comment '课程id',
-    name      varchar(50)                       not null comment '级别名字',
-    status    int                               not null default 1 comment '1 有效 99 删除',
-    create_ts timestamp                         not null default current_timestamp,
-    update_ts timestamp                         not null default current_timestamp on update current_timestamp,
+    id                  bigint primary key auto_increment   not null comment '级别id',
+    course_id           bigint                              not null comment '课程id',
+    name                varchar(50)                         not null comment '级别名字',
+    course_semester     int                                 not null comment '课程学期 1 春季 2 暑期 3 秋季 4 寒假',
+    course_origin_price decimal(10, 2)                      not null comment '原始课程价格',
+    course_count        int                                 not null comment '课程时数',
+    status              int                                 not null default 1 comment '1 有效 99 删除',
+    create_ts           timestamp                           not null default current_timestamp,
+    update_ts           timestamp                           not null default current_timestamp on update current_timestamp,
     unique uniq_course_grade (course_id, grade),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)

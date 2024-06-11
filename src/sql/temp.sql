@@ -28,7 +28,7 @@ create table student
     index idx_stu_name (stu_name),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '学员表';
+) DEFAULT CHARSET=utf8mb4 comment '学员表';
 
 create table family (
     id              bigint primary key auto_increment  not null comment '家庭id',
@@ -43,12 +43,13 @@ create table family (
     index idx_family_name (family_name),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '家庭表'
+) DEFAULT CHARSET=utf8mb4 comment '家庭表'
 
-create table familyMember (
+create table family_member (
     id              bigint primary key auto_increment  not null comment '家庭-成员关联id',
     family_id       bigint                             not null comment '家庭id',
     student_id      bigint                             not null comment '学员id',
+    is_main         int                                not null default 0 comment '是否是主要成员 0 否 1 是',
     status          int                                not null default 1 comment '1 有效 99 删除',
     create_ts       timestamp                          not null default current_timestamp comment '入学时间',
     update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
@@ -56,9 +57,9 @@ create table familyMember (
     index idx_student_id (student_id),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '家庭成员表'
+) DEFAULT CHARSET=utf8mb4 comment '家庭成员表'
 
-create table familyMembership (
+create table family_member_ship (
     id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
     family_id       bigint                             not null comment '家庭id',
     discount        decimal(10, 2)                     not null comment '会员折扣',
@@ -68,9 +69,9 @@ create table familyMembership (
     index idx_family_id (family_id),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '家庭会员表'
+) DEFAULT CHARSET=utf8mb4 comment '家庭会员表'
 
-create table familyCostRecord (
+create table family_cost_record (
     id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
     family_id       bigint                             not null comment '家庭id',
     student_id      bigint                             not null comment '学员id',
@@ -87,7 +88,7 @@ create table familyCostRecord (
     index idx_student_id (student_id),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '家庭费用记录表'
+) DEFAULT CHARSET=utf8mb4 comment '家庭费用记录表'
 
 create table teacher
 (
@@ -102,7 +103,7 @@ create table teacher
     index idx_tea_name (tea_name),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '教师表';
+) DEFAULT CHARSET=utf8mb4 comment '教师表';
 
 create table course
 (
@@ -114,7 +115,7 @@ create table course
     unique uniq_name (name),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '课程表';
+) DEFAULT CHARSET=utf8mb4 comment '课程表';
 
 create table course_grade
 (
@@ -130,7 +131,7 @@ create table course_grade
     unique uniq_course_grade (course_id, grade),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '课程级别表';
+) DEFAULT CHARSET=utf8mb4 comment '课程级别表';
 
 create table class
 (
@@ -142,7 +143,7 @@ create table class
     update_ts timestamp                         not null default current_timestamp on update current_timestamp,
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '班级表';
+) DEFAULT CHARSET=utf8mb4 comment '班级表';
 
 create table student_class
 (
@@ -154,7 +155,7 @@ create table student_class
     update_ts           timestamp                         not null default current_timestamp on update current_timestamp,
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '学生关联班级';
+) DEFAULT CHARSET=utf8mb4 comment '学生关联班级';
 
 create table student_pay_class_record
 (
@@ -173,7 +174,7 @@ create table student_pay_class_record
     index idx_class_id (class_id),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '学生购买班级课程记录';
+) DEFAULT CHARSET=utf8mb4 comment '学生购买班级课程记录';
     -- remain_course_count int                               not null comment '剩余课程次数',
     -- record_status       int                               not null default 1 comment '1 购买成功 2 已完结',
     -- member              int                               not null default 0 comment '0 非会员 1会员',
@@ -197,7 +198,7 @@ create table student_attend_course_record
     index idx_attend_date (attend_date),
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '学生上课记录';
+) DEFAULT CHARSET=utf8mb4 comment '学生上课记录';
 
 
 
@@ -215,7 +216,7 @@ create table teacher_class
     update_ts           timestamp                         not null default current_timestamp on update current_timestamp comment '更新时间',
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
-) comment '老师关联班级';
+) DEFAULT CHARSET=utf8mb4 comment '老师关联班级';
 
 select *
 from teacher_class tc

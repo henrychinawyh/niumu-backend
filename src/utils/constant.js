@@ -17,6 +17,8 @@ const TABLENAME = {
   TEACHERCLASS: "teacher_class",
   STUDENTPAYCLASSRECORD: "student_pay_class_record",
   STUDENTATTENDCOURSERECORD: "student_attend_course_record",
+  FAMILY: "family",
+  FAMILYMEMBER: "family_member",
 };
 
 // 空数据

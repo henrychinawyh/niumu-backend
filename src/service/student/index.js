@@ -2,6 +2,13 @@ const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const { getQueryData, toUnderlineData } = require("../../utils/database");
 const {
+  removeFamilyMemberSql,
+  queryFamilyMemberByFamilyIdSql,
+  delFamilyByFamilyIdSql,
+  updateFamilyDetailSql,
+  updateFamilyMemberDetailSql,
+} = require("../family/sql");
+const {
   queryStudentSql,
   queryStudentListTotalSql,
   queryOneStudentSql,
@@ -64,8 +71,64 @@ const edit = async (data) => {
 // 删除学生
 const removeStudent = async (data) => {
   try {
-    const res = await transaction(removeStudentSql(data));
-    return res;
+    const studentIds = data?.map((item) => item?.studentId);
+
+    data?.forEach(async (item) => {
+      const { isMain, studentId, familyId } = item;
+
+      if (isMain) {
+        // 查询当前家庭下是否有其他成员
+        const familyMembers = (
+          await exec(queryFamilyMemberByFamilyIdSql({ familyId }))
+        ).filter((member) => member.studentId !== studentId);
+
+        if (familyMembers.length > 0) {
+          if (
+            familyMembers?.every(
+              (member) => studentIds.includes(member?.studentId), // 一个家庭中的成员全部被删除
+            )
+          ) {
+            await exec(removeStudentSql(studentId)); // 删除学生id
+            await exec(removeFamilyMemberSql({ familyId, studentId })); // 删除学生与家庭的关系
+            await exec(delFamilyByFamilyIdSql({ familyId })); // 删除家庭
+          } else {
+            // 如果是部分学生被删除，找出没有被删除的学生，并且设置他为那个家庭的主成员，被删除的删除学员信息和与家庭的绑定关系
+            const delFamilyStudentIds = data
+              ?.filter((i) => i.familyId === familyId)
+              .map((i) => i.studentId);
+            const student = familyMembers.filter(
+              (member) => !delFamilyStudentIds.includes(member?.studentId),
+            )?.[0]; // 查询到此学生的学生信息，需要将此学生设置为家庭中的主要成员
+
+            await exec(removeStudentSql(studentId)); // 删除学生id
+            await exec(removeFamilyMemberSql({ familyId, studentId })); // 删除学生与家庭的关系
+
+            // 给家庭新的主成员信息
+            await exec(
+              updateFamilyDetailSql({
+                familyName: `${student?.studentName}的家庭`,
+                mainMemberId: student?.idCard,
+              }),
+            );
+            // 更新家庭成员信息（更新为主成员）
+            await exec(
+              updateFamilyMemberDetailSql({
+                id: student?.familyMemberId,
+                isMain: 1,
+              }),
+            );
+          }
+        } else {
+          // 没有其他家庭成员
+          await exec(removeStudentSql(studentId)); // 删除学生id
+          await exec(removeFamilyMemberSql({ familyId, studentId })); // 删除学生与家庭的关系
+          await exec(delFamilyByFamilyIdSql({ familyId })); // 删除家庭
+        }
+      } else {
+        await exec(removeStudentSql(studentId)); // 删除学生id
+        await exec(removeFamilyMemberSql({ familyId, studentId })); // 删除学生与家庭的关系
+      }
+    });
   } catch (err) {
     console.log(err, "err");
   }

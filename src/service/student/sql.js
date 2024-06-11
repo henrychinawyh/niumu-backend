@@ -6,28 +6,44 @@ const {
   toUnderlineData,
   toUnderline,
 } = require("../../utils/database");
+const { where } = require("sequelize");
+const { omit } = require("radash");
 
 // 查询学生列表SQL
 const queryStudentSql = (data) => {
-  const { current = 1, pageSize = 10 } = data;
+  const { current = 1, pageSize = 10, status, ...rest } = data;
   return sql
     .table(TABLENAME.STUDENT)
     .field([
-      "id",
-      "status",
+      `${TABLENAME.STUDENT}.id AS id`,
+      `IFNULL(${TABLENAME.FAMILYMEMBER}.family_id, "") AS familyId`,
       'IFNULL(birth_date, "") AS birthDate',
       'IFNULL(phone_number, "") AS phoneNumber',
       'IFNULL(stu_name, "") AS stuName',
       'IFNULL(id_card, "") AS idCard',
-      'IFNULL(create_ts, "") AS createTs',
-      'IFNULL(update_ts, "") AS updateTs',
+      `IFNULL(${TABLENAME.STUDENT}.create_ts, "") AS createTs`,
+      `IFNULL(${TABLENAME.STUDENT}.update_ts, "") AS updateTs`,
+      `${TABLENAME.STUDENT}.status AS status`,
+      `${TABLENAME.FAMILYMEMBER}.is_main AS isMain`,
       "sex",
       "age",
       "school_name AS schoolName",
       "has_cousin AS hasCousin",
     ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.FAMILYMEMBER,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.FAMILYMEMBER}.student_id`],
+        },
+      },
+    ])
     .page(current, pageSize)
-    .where({ ...toUnderlineData(getQueryData(data)) })
+    .where({
+      ...toUnderlineData(getQueryData(rest)),
+      [`${TABLENAME.STUDENT}.status`]: status,
+    })
     .select();
 };
 
@@ -94,28 +110,14 @@ const editSql = (data) => {
 };
 
 // 删除学生SQL
-const removeStudentSql = (data) => {
-  const { ids } = data || {};
-
-  return Array.isArray(ids)
-    ? ids.map((id) =>
-        sql
-          .table(TABLENAME.STUDENT)
-          .data({
-            status: 99,
-          })
-          .where({ id })
-          .update(),
-      )
-    : [
-        sql
-          .table(TABLENAME.STUDENT)
-          .data({
-            status: 99,
-          })
-          .where({ id: ids })
-          .update(),
-      ];
+const removeStudentSql = (id) => {
+  return sql
+    .table(TABLENAME.STUDENT)
+    .data({
+      status: 99,
+    })
+    .where({ id })
+    .update();
 };
 
 // 导出学生表SQL

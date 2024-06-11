@@ -75,14 +75,12 @@ class StudentController {
   // 删除学员
   async deleteStudent(ctx, next) {
     try {
-      const res = await removeStudent(ctx.request.body);
+      await removeStudent(ctx.request.body);
 
-      if (res.length > 0) {
-        commonResult(ctx, {
-          status: 200,
-          message: "删除成功",
-        });
-      }
+      commonResult(ctx, {
+        status: 200,
+        message: "删除成功",
+      });
     } catch (err) {
       commonServerWrongResult(ctx, `删除学员失败：${err}`);
     }
@@ -113,7 +111,7 @@ class StudentController {
             idCard,
             dayjs(birthDate).format("YYYY-MM-DD"),
             dayjs(createTs).format("YYYY-MM-DD"),
-          ]
+          ],
         );
 
         exportExcel({

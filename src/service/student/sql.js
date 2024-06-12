@@ -11,7 +11,7 @@ const { omit } = require("radash");
 
 // 查询学生列表SQL
 const queryStudentSql = (data) => {
-  const { current = 1, pageSize = 10, status, ...rest } = data;
+  const { current = 1, pageSize = 10, status = 1, ...rest } = data;
   return sql
     .table(TABLENAME.STUDENT)
     .field([

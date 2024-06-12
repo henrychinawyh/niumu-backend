@@ -1,3 +1,4 @@
+const { omit } = require("radash");
 const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const { getQueryData, toUnderlineData } = require("../../utils/database");
@@ -7,6 +8,9 @@ const {
   delFamilyByFamilyIdSql,
   updateFamilyDetailSql,
   updateFamilyMemberDetailSql,
+  addFamilySql,
+  queryFamilySql,
+  addFamilyMemberSql,
 } = require("../family/sql");
 const {
   queryStudentSql,
@@ -50,7 +54,46 @@ const queryOneStudent = async (data) => {
 // 新建学生
 const addStudent = async (data) => {
   try {
-    const res = await exec(addStudentSql(data));
+    const [res, student] = await transaction([
+      addStudentSql(omit(data, ["relateWay", "familyId", "familyName"])),
+      queryStudentSql({
+        idCard: data?.idCard,
+      }),
+    ]);
+
+    const { id: studentId } = student?.[0] || {};
+
+    if (data?.relateWay) {
+      // 新建家庭
+      if (data?.relateWay === "0") {
+        const [res1, list] = await transaction([
+          addFamilySql({
+            familyName: data?.familyName,
+            mainMemberId: data?.idCard,
+          }),
+          queryFamilySql({
+            mainMemberId: data?.idCard,
+          }),
+        ]);
+        if (list?.length > 0) {
+          // 添加家庭与学生的关系
+          await exec(
+            addFamilyMemberSql({
+              studentId,
+              familyId: list[0].id,
+            }),
+          );
+        }
+      } else {
+        // 关联家庭
+        await exec(
+          addFamilyMemberSql({
+            studentId,
+            familyId: data?.familyId,
+          }),
+        );
+      }
+    }
 
     return res;
   } catch (err) {
@@ -108,6 +151,7 @@ const removeStudent = async (data) => {
               updateFamilyDetailSql({
                 familyName: `${student?.studentName}的家庭`,
                 mainMemberId: student?.idCard,
+                familyId,
               }),
             );
             // 更新家庭成员信息（更新为主成员）

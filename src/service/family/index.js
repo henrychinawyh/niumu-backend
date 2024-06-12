@@ -31,8 +31,6 @@ const addFamily = async (data) => {
       }),
     ]);
 
-    console.log(list);
-
     if (list?.length > 0) {
       // 添加家庭与学生的关系
       await exec(

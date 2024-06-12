@@ -7,7 +7,10 @@ const { toUnderlineData, toUnderline } = require("../../utils/database");
 const queryFamilySql = (data) => {
   const { familyName, ...rest } = data;
 
-  const whereParams = toUnderlineData(rest);
+  const whereParams = toUnderlineData({
+    status: 1,
+    ...rest,
+  });
 
   if (familyName) {
     whereParams[`${toUnderline("familyName")}`] = {

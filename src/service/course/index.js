@@ -1,6 +1,6 @@
 const { exec, sql, transaction } = require("../../db/seq");
 const { transformData } = require("../../utils");
-const { TABLENAME } = require("../../utils/constant");
+const { TABLENAME, SEMESTER } = require("../../utils/constant");
 const {
   toUnderlineData,
   getQueryData,
@@ -243,12 +243,20 @@ const getAllSubjects = async (data) => {
 
   try {
     const res = await exec(getAllSubjectsSql());
+    console.log(res);
 
     return {
-      data: transformData(res || [], layer),
+      data: transformData(
+        res.map((item) => ({
+          ...item,
+          courseSemesterName: SEMESTER[item.courseSemester],
+        })) || [],
+        layer,
+      ),
       status: 200,
     };
   } catch (err) {
+    console.log(err);
     return {
       status: 500,
       message: err?.sqlMessage || err,

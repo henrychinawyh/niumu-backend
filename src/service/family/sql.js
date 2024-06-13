@@ -5,7 +5,7 @@ const { toUnderlineData, toUnderline } = require("../../utils/database");
 
 // 查询家庭信息
 const queryFamilySql = (data) => {
-  const { familyName, ...rest } = data;
+  const { familyName, current = 1, pageSize = 1000, ...rest } = data;
 
   const whereParams = toUnderlineData({
     status: 1,
@@ -26,7 +26,32 @@ const queryFamilySql = (data) => {
       "is_member AS isMember",
       "account_balance AS accountBalance",
       "main_member_id AS mainMemberId",
+      "create_ts as createTime",
+      "discount",
     ])
+    .page(current, pageSize)
+    .where(whereParams)
+    .select();
+};
+
+// 查询家庭总数
+const queryFamilyListTotalSql = (data) => {
+  const { familyName, ...rest } = data;
+
+  const whereParams = toUnderlineData({
+    status: 1,
+    ...omit(rest, ["current", "pageSize"]),
+  });
+
+  if (familyName) {
+    whereParams[`${toUnderline("familyName")}`] = {
+      like: `%${familyName}%`,
+    };
+  }
+
+  return sql
+    .table(TABLENAME.FAMILY)
+    .field(["count(*) as total"])
     .where(whereParams)
     .select();
 };
@@ -152,6 +177,51 @@ const updateFamilyMemberDetailSql = (data) => {
     .update();
 };
 
+/**
+ * @name 家庭账户办理会员信息
+ * @param familyId 家庭id
+ * @param isMember 是否是会员
+ * @param discount 折扣
+ * @param accountBalance 充值金额
+ */
+const createMemberSql = (data) => {
+  const { familyId, accountBalance, discount } = data;
+  return sql
+    .table(TABLENAME.FAMILY)
+    .data({
+      discount,
+      [toUnderline("isMember")]: 1,
+      [toUnderline("accountBalance")]:
+        `${toUnderline("accountBalance")} + ${accountBalance}`,
+    })
+    .where({
+      id: familyId,
+      status: 1,
+    })
+    .update();
+};
+
+/**
+ * @name 充值账户
+ * @param familyId 家庭id
+ * @param accountBalance 充值金额
+ */
+const rechargeAccountSql = (data) => {
+  const { familyId, accountBalance } = data;
+
+  return sql
+    .table(TABLENAME.FAMILY)
+    .data({
+      [toUnderline("accountBalance")]:
+        `${toUnderline("accountBalance")} + ${accountBalance}`,
+    })
+    .where({
+      id: familyId,
+      status: 1,
+    })
+    .update();
+};
+
 module.exports = {
   queryFamilySql,
   addFamilySql,
@@ -161,4 +231,7 @@ module.exports = {
   delFamilyByFamilyIdSql,
   updateFamilyDetailSql,
   updateFamilyMemberDetailSql,
+  queryFamilyListTotalSql,
+  createMemberSql,
+  rechargeAccountSql,
 };

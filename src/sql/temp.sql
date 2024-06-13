@@ -34,6 +34,7 @@ create table family (
     id              bigint primary key auto_increment  not null comment '家庭id',
     family_name     varchar(20)                        not null comment '家庭名字', 
     is_member       int                                not null default 0 comment '是否是会员 0 否 1 是',
+    discount        decimal(10, 2)                     not null default 0 comment '折扣',
     account_balance decimal(10, 2)                     not null default 0 comment '账户余额',
     main_member_id  varchar(20)                        not null comment '主要家庭成员身份证号',
     status          int                                not null default 1 comment '1 有效 99 删除',
@@ -59,17 +60,6 @@ create table family_member (
     index idx_update_ts (update_ts)
 ) DEFAULT CHARSET=utf8mb4 comment '家庭成员表'
 
-create table family_member_ship (
-    id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
-    family_id       bigint                             not null comment '家庭id',
-    discount        decimal(10, 2)                     not null comment '会员折扣',
-    status          int                                not null default 1 comment '1 有效 99 删除',
-    create_ts       timestamp                          not null default current_timestamp comment '会员创建时间',
-    update_ts       timestamp                          not null default current_timestamp on update current_timestamp,
-    index idx_family_id (family_id),
-    index idx_create_ts (create_ts),
-    index idx_update_ts (update_ts)
-) DEFAULT CHARSET=utf8mb4 comment '家庭会员表'
 
 create table family_cost_record (
     id              bigint primary key auto_increment  not null comment '家庭支付记录id',

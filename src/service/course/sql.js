@@ -264,6 +264,7 @@ const getAllSubjectsSql = () => {
       `${TABLENAME.COURSE}.name AS courseName`,
       `${TABLENAME.COURSEGRADE}.id AS gradeId`,
       `${TABLENAME.COURSEGRADE}.name AS gradeName`,
+      `${TABLENAME.COURSEGRADE}.course_semester AS courseSemester`,
       `IFNULL(${TABLENAME.CLASS}.id, "") AS classId`,
       `IFNULL(${TABLENAME.CLASS}.name, "") AS className`,
     ])

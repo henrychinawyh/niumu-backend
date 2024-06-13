@@ -153,8 +153,15 @@ const delStudentInAttendanceSql = (data) => {
  * @params {Number} teaName 教师名称
  */
 const queryClassSql = (data) => {
-  const { current, pageSize, courseId, gradeId, classId, teacherName } =
-    data || {};
+  const {
+    current,
+    pageSize,
+    courseId,
+    gradeId,
+    classId,
+    teacherName,
+    courseSemester,
+  } = data || {};
 
   const whereParams = {
     [`${TABLENAME.CLASS}.status`]: 1,
@@ -173,6 +180,9 @@ const queryClassSql = (data) => {
   if (teacherName) {
     whereParams[`${TABLENAME.TEACHER}.tea_name`] = teacherName;
   }
+  if (courseSemester) {
+    whereParams[`${TABLENAME.COURSEGRADE}.course_semester`] = courseSemester;
+  }
 
   return sql
     .table(TABLENAME.CLASS)
@@ -183,6 +193,7 @@ const queryClassSql = (data) => {
       `${TABLENAME.COURSE}.id AS courseId`,
       `${TABLENAME.COURSEGRADE}.id AS gradeId`,
       `${TABLENAME.COURSEGRADE}.name AS gradeName`,
+      `${TABLENAME.COURSEGRADE}.course_semester AS courseSemester`,
       `${TABLENAME.TEACHER}.id AS teacherId`,
       `${TABLENAME.TEACHER}.tea_name AS teacherName`,
       `${convertIfNull("createTs", "", TABLENAME.CLASS)}`,

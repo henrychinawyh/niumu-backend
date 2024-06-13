@@ -1,5 +1,13 @@
 const { exec, transaction } = require("../../db/seq");
-const { addFamilySql, queryFamilySql, addFamilyMemberSql } = require("./sql");
+const { removeQuotesFromCalculations } = require("../../utils");
+const {
+  addFamilySql,
+  queryFamilySql,
+  addFamilyMemberSql,
+  queryFamilyListTotalSql,
+  createMemberSql,
+  rechargeAccountSql,
+} = require("./sql");
 
 // 查询家庭(按条件查询)
 const queryFamily = async (data) => {
@@ -16,6 +24,30 @@ const queryFamily = async (data) => {
     return {
       status: 500,
       message: err.sqlMessage || err,
+    };
+  }
+};
+
+// 查询家庭列表
+const queryFamilyList = async (data) => {
+  try {
+    const [list, total] = await transaction([
+      queryFamilySql(data),
+      queryFamilyListTotalSql(data),
+    ]);
+
+    return {
+      status: 200,
+      data: {
+        list,
+        total: total[0].total,
+      },
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      status: 500,
+      message: err,
     };
   }
 };
@@ -64,7 +96,43 @@ const createRelationship = async (data) => {
       message: "新建成功",
     };
   } catch (err) {
-    console.log(err);
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
+  }
+};
+
+// 家庭账户办理会员
+const createMember = async (data) => {
+  try {
+    console.log(removeQuotesFromCalculations(createMemberSql(data)));
+    await exec(removeQuotesFromCalculations(createMemberSql(data)));
+
+    return {
+      status: 200,
+      data: true,
+      message: "创建成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err.sqlMessage || err,
+    };
+  }
+};
+
+// 充值账户
+const rechargeAccount = async (data) => {
+  try {
+    await exec(removeQuotesFromCalculations(rechargeAccountSql(data)));
+
+    return {
+      status: 200,
+      data: true,
+      message: "充值成功",
+    };
+  } catch (err) {
     return {
       status: 500,
       message: err.sqlMessage || err,
@@ -76,4 +144,7 @@ module.exports = {
   queryFamily,
   addFamily,
   createRelationship,
+  queryFamilyList,
+  createMember,
+  rechargeAccount,
 };

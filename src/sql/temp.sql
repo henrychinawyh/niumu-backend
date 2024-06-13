@@ -72,7 +72,7 @@ create table family_member_ship (
 ) DEFAULT CHARSET=utf8mb4 comment '家庭会员表'
 
 create table family_cost_record (
-    id              bigint primary key auto_increment  not null comment '家庭-会员关联id(会员id)',
+    id              bigint primary key auto_increment  not null comment '家庭支付记录id',
     family_id       bigint                             not null comment '家庭id',
     student_id      bigint                             not null comment '学员id',
     cost            decimal(10, 2)                     not null comment '消费金额',
@@ -124,6 +124,7 @@ create table course_grade
     name                varchar(50)                         not null comment '级别名字',
     course_semester     int                                 not null comment '课程学期 1 春季 2 暑期 3 秋季 4 寒假',
     course_origin_price decimal(10, 2)                      not null comment '原始课程价格',
+    each_course_price   decimal(10, 2)                      not null comment '课程单价',
     course_count        int                                 not null comment '课程时数',
     status              int                                 not null default 1 comment '1 有效 99 删除',
     create_ts           timestamp                           not null default current_timestamp,

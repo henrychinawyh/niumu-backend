@@ -8,8 +8,9 @@ const {
   toUnderline,
   handleGroupBy,
 } = require("../../utils/database");
+const { floor } = require("lodash");
 
-// 查询课程是否已新建
+// 根据课程名称查询课程
 const hasCourseSql = (data) => {
   const { name } = data;
   return sql.table(TABLENAME.COURSE).where({ name, status: 1 }).select();
@@ -42,7 +43,11 @@ const batchInsertCourseGradeSql = (data, id) => {
       .table(TABLENAME.COURSEGRADE)
       .data({
         course_id: id,
-        ...gradeItem,
+        ...toUnderlineData(gradeItem),
+        each_course_price: floor(
+          gradeItem["courseOriginPrice"] / gradeItem["courseCount"],
+          2,
+        ),
       })
       .insert(),
   );
@@ -51,6 +56,12 @@ const batchInsertCourseGradeSql = (data, id) => {
 // 获取课程列表SQL
 const queryCourseListSql = (data) => {
   const { current = 1, pageSize = 10 } = data;
+
+  const whereParams = Object.assign(
+    {},
+    { ...toUnderlineData(getQueryData(data)), status: 1 },
+    data.name ? { name: { like: `%${data.name}%` } } : {},
+  );
 
   return sql
     .table(TABLENAME.COURSE)
@@ -62,15 +73,21 @@ const queryCourseListSql = (data) => {
       'IFNULL(update_ts, "") AS updateTs',
     ])
     .page(current, pageSize)
-    .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
+    .where(whereParams)
     .select();
 };
 
 // 获取课程列表总数SQL
 const queryCourseListTotalSql = (data) => {
+  const whereParams = Object.assign(
+    {},
+    { ...toUnderlineData(getQueryData(data)), status: 1 },
+    data.name ? { name: { like: `%${data.name}%` } } : {},
+  );
+
   return sql
     .table(TABLENAME.COURSE)
-    .where({ ...toUnderlineData(getQueryData(data)), status: 1 })
+    .where(whereParams)
     .count("*", "total")
     .select();
 };
@@ -88,7 +105,13 @@ const queryCourseStuTotalSql = (data) => {
       [`${TABLENAME.COURSE}.status`]: 1,
       [`${TABLENAME.STUDENTCLASS}.id`]: { gt: 0 },
     },
-    name ? { [`${TABLENAME.COURSE}.name`]: name } : {},
+    name
+      ? {
+          [`${TABLENAME.COURSE}.name`]: {
+            like: `%${name}%`,
+          },
+        }
+      : {},
   );
 
   return sql
@@ -199,7 +222,13 @@ const editSql = (data) => {
 const getGradeSql = (data) => {
   return sql
     .table(TABLENAME.COURSEGRADE)
-    .field(convertListToSelectOption(["id", "name"]))
+    .field([
+      ...convertListToSelectOption(["id", "name"]),
+      "course_semester AS courseSemester",
+      "course_count AS courseCount",
+      "course_origin_price AS courseOriginPrice",
+      "each_course_price AS eachCoursePrice",
+    ])
     .where({
       ...toUnderlineData(data),
       status: 1,
@@ -288,13 +317,14 @@ const getAllSubjectsSql = () => {
  * @name 检查同课程下是否已经存在同名的级别
  */
 const queryGradeNameUnderCourseSql = (data) => {
-  const { courseId, name } = data;
+  const { courseId, name, courseSemester } = data;
 
   return sql
     .table(TABLENAME.COURSEGRADE)
     .where({
       [`${toUnderline("courseId")}`]: courseId,
       name,
+      course_semester: courseSemester,
       status: 1,
     })
     .select();
@@ -308,8 +338,17 @@ const queryGradeNamesUnderCourseSql = (data) => {
 
   return sql
     .table(TABLENAME.COURSEGRADE)
+    .field([
+      "name",
+      "course_semester AS courseSemester",
+      "id",
+      "course_id AS courseId",
+    ])
     .where({
       [`${toUnderline("courseId")}`]: courseId,
+      [`${toUnderline("courseSemester")}`]: {
+        in: grades?.map((item) => `"${item.courseSemester}"`).join(","),
+      },
       name: {
         in: grades?.map((item) => `"${item.name}"`).join(","),
       },

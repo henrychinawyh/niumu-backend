@@ -11,12 +11,11 @@ const {
   queryAllSubjects,
   addCourseGrade,
 } = require("../controlller/course");
-const {
-  hasClassNameUnderCourseGrade,
-} = require("../middleware/class.middleware");
+
 const {
   hasGradeNameUnderCourse,
   hasGradeNamesUnderCourse,
+  hasCourse,
 } = require("../middleware/course.middleware");
 
 // 更新课程的同时，也需要编辑课程的级别
@@ -26,7 +25,7 @@ const router = new Router({
 });
 
 // 新增课程
-router.post("/createCourse", hasClassNameUnderCourseGrade, createCourse);
+router.post("/createCourse", hasCourse, createCourse);
 
 // 获取课程列表
 router.post("/getCourseList", getCourseList);
@@ -35,10 +34,10 @@ router.post("/getCourseList", getCourseList);
 router.post("/getAllCourses", getAll);
 
 // 删除课程
-router.post("/deleteCourse", hasClassNameUnderCourseGrade, deleteCourse);
+router.post("/deleteCourse", deleteCourse);
 
 // 编辑课程
-router.post("/editCourse", editCourse);
+router.post("/editCourse", hasCourse, editCourse);
 
 // 获取课程的级别
 router.post("/getCourseGrade", getCourseGrade);

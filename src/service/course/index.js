@@ -38,15 +38,6 @@ const addCourse = async (data) => {
   }
 
   try {
-    // 查询课程是否已经新建
-    const hasCourse = await exec(hasCourseSql(data));
-    if (hasCourse.length) {
-      return {
-        status: 500,
-        message: "课程已存在",
-      };
-    }
-
     // 插入课程并查询课程id
     const insertRes = await transaction([
       insertCourseSql(data),

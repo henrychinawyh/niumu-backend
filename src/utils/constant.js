@@ -34,8 +34,16 @@ const EMPTY_DATA = {
   }),
 };
 
+// 学期
+const SEMESTER = {
+  1: "春季",
+  2: "暑期",
+  3: "秋季",
+};
+
 module.exports = {
   GENDER,
   TABLENAME,
   EMPTY_DATA,
+  SEMESTER,
 };

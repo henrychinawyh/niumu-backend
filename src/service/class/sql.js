@@ -194,6 +194,9 @@ const queryClassSql = (data) => {
       `${TABLENAME.COURSEGRADE}.id AS gradeId`,
       `${TABLENAME.COURSEGRADE}.name AS gradeName`,
       `${TABLENAME.COURSEGRADE}.course_semester AS courseSemester`,
+      `${TABLENAME.COURSEGRADE}.course_origin_price AS courseOriginPrice`,
+      `${TABLENAME.COURSEGRADE}.each_course_price AS eachCoursePrice`,
+      `${TABLENAME.COURSEGRADE}.course_count AS courseCount`,
       `${TABLENAME.TEACHER}.id AS teacherId`,
       `${TABLENAME.TEACHER}.tea_name AS teacherName`,
       `${convertIfNull("createTs", "", TABLENAME.CLASS)}`,
@@ -312,6 +315,10 @@ const queryStudentOfEachClassSql = (data) => {
       `${TABLENAME.STUDENTCLASS}.class_id AS classId`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS payId`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.payment AS payment`,
+      `${TABLENAME.FAMILY}.is_member AS isMember`,
+      `${TABLENAME.FAMILY}.discount AS discount`,
+      `${TABLENAME.FAMILY}.account_balance AS accountBalance`,
     ])
     .join([
       {
@@ -319,6 +326,20 @@ const queryStudentOfEachClassSql = (data) => {
         table: TABLENAME.STUDENT,
         where: {
           [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.FAMILYMEMBER,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.FAMILYMEMBER}.student_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.FAMILY,
+        where: {
+          [`${TABLENAME.FAMILYMEMBER}.family_id`]: [`${TABLENAME.FAMILY}.id`],
         },
       },
       {

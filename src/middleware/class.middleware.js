@@ -32,11 +32,12 @@ const hasClassNameUnderCourseGrade = async (ctx, next) => {
 
   if (
     res?.length &&
-    res?.[0]?.name === data?.name &&
-    res?.[0]?.id !== data?.classId
+    res?.[0]?.name === data?.name?.trim() &&
+    res?.[0]?.id !== data?.classId &&
+    res?.[0]?.["course_id"] === data?.courseId
   ) {
     commonResult(ctx, {
-      message: "同课程同级别下的班级名称已存在，请重新输入班级名称",
+      message: "同课程下的班级名称已存在，请重新输入班级名称",
       status: 500,
     });
     return;

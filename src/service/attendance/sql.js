@@ -12,7 +12,7 @@ const queryAttendanceListSql = (data) => {
   const { classId, current, pageSize } = data;
 
   return sql
-    .table(TABLENAME.STUDENT)
+    .table(TABLENAME.STUDENTCLASS)
     .field([
       `${TABLENAME.STUDENTCLASS}.id AS id`,
       `${TABLENAME.STUDENTCLASS}.class_id AS classId`,
@@ -22,15 +22,12 @@ const queryAttendanceListSql = (data) => {
       `${TABLENAME.STUDENTPAYCLASSRECORD}.paid_course_count AS paidCourseCount`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_cost AS remainCost`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.real_price AS realPrice`,
+      `${TABLENAME.FAMILY}.is_member AS isMember`,
+      `${TABLENAME.FAMILY}.discount AS discount`,
+      `${TABLENAME.FAMILY}.account_balance AS accountBalance`,
     ])
     .join([
-      {
-        dir: "right",
-        table: TABLENAME.STUDENTCLASS,
-        where: {
-          [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
-        },
-      },
       {
         dir: "left",
         table: TABLENAME.STUDENTPAYCLASSRECORD,
@@ -38,6 +35,29 @@ const queryAttendanceListSql = (data) => {
           [`${TABLENAME.STUDENTCLASS}.id`]: [
             `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
           ],
+        },
+      },
+      {
+        dir: "right",
+        table: TABLENAME.STUDENT,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          ],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.FAMILYMEMBER,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.FAMILYMEMBER}.student_id`],
+        },
+      },
+      {
+        dir: "right",
+        table: TABLENAME.FAMILY,
+        where: {
+          [`${TABLENAME.FAMILY}.id`]: [`${TABLENAME.FAMILYMEMBER}.family_id`],
         },
       },
     ])

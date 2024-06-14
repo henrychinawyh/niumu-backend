@@ -11,20 +11,27 @@ const { toUnderline } = require("../../utils/database");
  * @param payId 支付记录id
  */
 const addPurchaseRecordSql = (data) => {
-  const { paidCourseCount, payment, id, studentId, realPrice, payId } =
-    data || {};
+  const {
+    paidCourseCount,
+    totalPayment,
+    payment,
+    studentClassId,
+    studentId,
+    realPrice,
+    payId,
+  } = data || {};
 
   if (!payId) {
     return sql
       .table(TABLENAME.STUDENTPAYCLASSRECORD)
       .data({
-        [`${toUnderline("studentClassId")}`]: id,
+        [`${toUnderline("studentClassId")}`]: studentClassId,
         [`${toUnderline("studentId")}`]: studentId,
         [`${toUnderline("paidCourseCount")}`]: paidCourseCount,
         [`${toUnderline("remainCourseCount")}`]: paidCourseCount,
         [`${toUnderline("realPrice")}`]: realPrice,
         payment,
-        [`${toUnderline("totalPayment")}`]: payment,
+        [`${toUnderline("totalPayment")}`]: totalPayment,
         [`${toUnderline("remainCost")}`]: payment,
       })
       .insert();

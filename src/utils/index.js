@@ -1,7 +1,7 @@
 const { SEMESTER } = require("./constant");
 
 // 将所有的课程类目转换为树形结构
-const transformData = (data, showLayer = 3) => {
+const transformData = (data) => {
   const tree = [];
 
   data.forEach((item) => {
@@ -64,6 +64,30 @@ const transformData = (data, showLayer = 3) => {
   return tree;
 };
 
+const getTreeDataByLayer = (treeData, layer = 3) => {
+  if (layer < 1) return [];
+
+  let result = JSON.parse(JSON.stringify(treeData));
+
+  function filterByLayer(nodes, currentLayer) {
+    if (currentLayer >= layer) {
+      nodes.forEach((node) => {
+        node.children = [];
+      });
+    } else {
+      nodes.forEach((node) => {
+        if (node.children && node.children.length > 0) {
+          filterByLayer(node.children, currentLayer + 1);
+        }
+      });
+    }
+  }
+
+  filterByLayer(result, 1);
+
+  return result;
+};
+
 // 精确计算保留N位小数
 const toFixed = (num, digits) => {
   const factor = Math.pow(10, digits);
@@ -86,4 +110,5 @@ module.exports = {
   transformData,
   toFixed,
   removeQuotesFromCalculations,
+  getTreeDataByLayer,
 };

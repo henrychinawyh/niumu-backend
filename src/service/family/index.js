@@ -106,7 +106,12 @@ const createRelationship = async (data) => {
 // 家庭账户办理会员
 const createMember = async (data) => {
   try {
-    console.log(removeQuotesFromCalculations(createMemberSql(data)));
+    if (!data?.familyId) {
+      return {
+        status: 500,
+        message: "请传入familyId",
+      };
+    }
     await exec(removeQuotesFromCalculations(createMemberSql(data)));
 
     return {
@@ -125,6 +130,12 @@ const createMember = async (data) => {
 // 充值账户
 const rechargeAccount = async (data) => {
   try {
+    if (!data?.familyId) {
+      return {
+        status: 500,
+        message: "请传入familyId",
+      };
+    }
     await exec(removeQuotesFromCalculations(rechargeAccountSql(data)));
 
     return {

@@ -63,6 +63,8 @@ const addClass = async (data) => {
         }),
       ]);
       return {
+        status: 200,
+        data: true,
         message: "新增成功",
       };
     }
@@ -96,37 +98,20 @@ const getClass = async (data) => {
     ]);
 
     if (Array.isArray(list) && list.length) {
+      // 查询每个班级的学员
       const [studentList] = await transaction([
         queryStudentOfEachClassSql({
           list: list?.map((item) => item?.classId),
         }),
-      ]); // 查询每个班级的学员
+      ]);
 
       // 根据查询到的班级，去查询班级里的人数
       list.forEach((item) => {
         const { classId } = item;
 
-        const students = (studentList || [])
-          ?.filter((student) => student?.classId === classId)
-          ?.map(
-            ({
-              id,
-              name,
-              birthDate,
-              sex,
-              remainCourseCount = 0,
-              studentId,
-              payId,
-            }) => ({
-              id,
-              name,
-              birthDate,
-              sex,
-              remainCourseCount: remainCourseCount ?? 0,
-              studentId,
-              payId,
-            }),
-          );
+        const students = (studentList || [])?.filter(
+          (student) => student?.classId === classId,
+        );
 
         item.studentList = students;
         item.total = students?.length;
@@ -194,7 +179,7 @@ const editClassByClassId = async (data) => {
     // 1. 查询班级下已存在的学员
     const res = await exec(queryStudentOfEachClassSql({ list: [classId] }));
     if (Array.isArray(res)) {
-      const idList = res.map((item) => item.id);
+      const idList = res.map((item) => item.studentId);
       // 要新增的数据
       addStus = diff(studentIds, idList);
     }
@@ -217,6 +202,7 @@ const editClassByClassId = async (data) => {
 
     return {
       status: 200,
+      data: true,
       message: "操作成功",
     };
   } catch (err) {

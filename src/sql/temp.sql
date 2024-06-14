@@ -126,12 +126,14 @@ create table course_grade
 
 create table class
 (
-    id        bigint primary key auto_increment not null comment '班级id',
-    grade_id  bigint                            not null comment '级别id',
-    name      varchar(50)                       not null comment '班级名字',
-    status    int                               not null default 1 comment '1 有效 99 删除',
-    create_ts timestamp                         not null default current_timestamp,
-    update_ts timestamp                         not null default current_timestamp on update current_timestamp,
+    id                 bigint primary key auto_increment not null comment '班级id',
+    course_id          bigint                            not null comment '课程id',
+    grade_id           bigint                            not null comment '级别id',
+    course_semester    int                               not null comment '课程学期 1 春季 2 暑期 3 秋季 4 寒假',
+    name               varchar(50)                       not null comment '班级名字',
+    status             int                               not null default 1 comment '1 有效 99 删除',
+    create_ts          timestamp                         not null default current_timestamp,
+    update_ts          timestamp                         not null default current_timestamp on update current_timestamp,
     index idx_create_ts (create_ts),
     index idx_update_ts (update_ts)
 ) DEFAULT CHARSET=utf8mb4 comment '班级表';

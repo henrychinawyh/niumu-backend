@@ -5,21 +5,9 @@ const { transaction, exec } = require("../../db/seq");
 // 给学员新建课时
 const addPurchaseRecord = async (data) => {
   try {
-    const { paidCourseCount, payment, students } = data;
+    const { courses } = data;
 
-    const realPrice = toFixed(payment / paidCourseCount, 2);
-    await transaction(
-      students.map((item) =>
-        addPurchaseRecordSql({
-          paidCourseCount,
-          payment,
-          id: item.id,
-          studentId: item.studentId,
-          payId: item.payId,
-          realPrice,
-        }),
-      ),
-    );
+    await transaction(courses.map((item) => addPurchaseRecordSql(item)));
 
     return {
       status: 200,

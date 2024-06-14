@@ -1,5 +1,5 @@
 const { exec, sql, transaction } = require("../../db/seq");
-const { transformData } = require("../../utils");
+const { transformData, getTreeDataByLayer } = require("../../utils");
 const { TABLENAME, SEMESTER } = require("../../utils/constant");
 const {
   toUnderlineData,
@@ -243,14 +243,14 @@ const getAllSubjects = async (data) => {
 
   try {
     const res = await exec(getAllSubjectsSql());
-    console.log(res);
-
     return {
-      data: transformData(
-        res.map((item) => ({
-          ...item,
-          courseSemesterName: SEMESTER[item.courseSemester],
-        })) || [],
+      data: getTreeDataByLayer(
+        transformData(
+          res.map((item) => ({
+            ...item,
+            courseSemesterName: SEMESTER[item.courseSemester],
+          })) || [],
+        ),
         layer,
       ),
       status: 200,

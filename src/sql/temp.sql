@@ -61,6 +61,7 @@ create table family_member (
 ) DEFAULT CHARSET=utf8mb4 comment '家庭成员表'
 
 
+-- 消费记录表
 create table family_cost_record (
     id              bigint primary key auto_increment  not null comment '家庭支付记录id',
     family_id       bigint                             not null comment '家庭id',
@@ -180,7 +181,11 @@ create table student_attend_course_record
     id               bigint primary key auto_increment not null comment '学生上课时间记录id',
     student_class_id bigint                            not null comment '学生关联班级id',
     student_id       bigint                            not null comment '学生id',
+    course_id        bigint                            not null comment '课程id',
+    course_semester  int                               not null comment '课程学期 1 春季 2 暑期 3 秋季 4 寒假',
+    grade_id         bigint                            not null comment '级别id',
     class_id         bigint                            not null comment '班级id',
+    payment          decimal(10, 2)                    not null comment '缴费金额',
     attend_date      date                              not null comment '上课时间',
     status           int                               not null default 1 comment '1 有效 99 删除',
     create_ts        timestamp                         not null default current_timestamp,

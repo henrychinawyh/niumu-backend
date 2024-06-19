@@ -7,6 +7,13 @@ const {
   updatePayClassRecordSql,
   queryAttendanceRecordSql,
 } = require("./sql");
+const { queryAccountBalanceSql } = require("../consume/sql/query");
+const { responseObject, removeQuotesFromCalculations } = require("../../utils");
+const {
+  cancelMemberSql,
+  addFamilyPurchaseRecordSql,
+} = require("../family/sql");
+const { reduceAccountBalanceSql } = require("../consume/sql/update");
 
 // 获取考勤列表
 const queryAttendanceList = async (data) => {
@@ -65,10 +72,36 @@ const queryAttendanceList = async (data) => {
  */
 const createAttendanceRecord = async (data) => {
   try {
-    await transaction([
-      createAttendanceRecordSql(data),
-      updatePayClassRecordSql(data),
-    ]);
+    // 查询当前账户
+    const accountRes = await exec(queryAccountBalanceSql(data));
+    const accountBalance = responseObject(accountRes)?.accountBalance;
+
+    if (+accountBalance && accountBalance < data?.realPrice) {
+      return {
+        status: 500,
+        message: "余额不足无法销课，请先充值",
+      };
+    }
+
+    await transaction(
+      [
+        // 是否要取消会员
+        +accountBalance === data?.realPrice && cancelMemberSql(data),
+        // 增加考勤记录
+        createAttendanceRecordSql(data),
+        // 更新课销记录
+        updatePayClassRecordSql(data),
+        // 增加家庭的消费记录
+        addFamilyPurchaseRecordSql({ ...data, actualPrice: data?.realPrice }),
+        // 减少家庭账户余额
+        removeQuotesFromCalculations(
+          reduceAccountBalanceSql({
+            familyId: data?.familyId,
+            actualPrice: data?.realPrice,
+          }),
+        ),
+      ].filter((item) => !!item),
+    );
 
     return {
       status: 200,

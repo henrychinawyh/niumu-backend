@@ -45,13 +45,14 @@ const hasClassByIdSql = (data) => {
  * @params {Number} name 班级名称
  */
 const addClassSql = (data) => {
-  const { courseId, gradeId, name } = data;
+  const { courseId, gradeId, name, courseSemester } = data;
   // 新增班级-关联某个课程下的级别
   return sql
     .table(TABLENAME.CLASS)
     .data({
       [toUnderline("gradeId")]: gradeId,
       [toUnderline("courseId")]: courseId,
+      [toUnderline("courseSemester")]: courseSemester,
       name,
     })
     .insert();
@@ -521,6 +522,46 @@ const delClassSql = (data) => {
     .update();
 };
 
+// 切换学员与班级的联系
+const changeStudentClassSql = (data) => {
+  const { studentClassId, classId } = data || {};
+
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .data({
+      [toUnderline("classId")]: classId,
+    })
+    .where({
+      id: studentClassId,
+      status: 1,
+    })
+    .update();
+};
+
+// 修改学员购买课程的记录
+const changeStudentPayClassRecordSql = (data) => {
+  const { studentId, payment, studentClassId, courseCount, realPrice, payId } =
+    data || {};
+
+  return sql
+    .table(TABLENAME.STUDENTPAYCLASSRECORD)
+    .data({
+      remain_course_count: courseCount,
+      remain_cost: realPrice,
+      payment: payment,
+      total_payment: payment,
+      real_price: realPrice,
+      paid_course_count: courseCount,
+      student_class_id: studentClassId,
+    })
+    .where({
+      student_id: studentId,
+      id: payId,
+      status: 1,
+    })
+    .update();
+};
+
 module.exports = {
   hasClassByNameSql,
   hasClassByIdSql,
@@ -540,4 +581,6 @@ module.exports = {
   delStudentSql,
   delClassSql,
   delStudentInAttendanceSql,
+  changeStudentClassSql,
+  changeStudentPayClassRecordSql,
 };

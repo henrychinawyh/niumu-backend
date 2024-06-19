@@ -6,6 +6,7 @@ const {
   queryRemianCourseCount,
   delStudent,
   delClass,
+  changeStudentClass,
 } = require("../../service/class");
 const { commonResult, commonServerWrongResult } = require("../common");
 
@@ -80,6 +81,16 @@ class ClassController {
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `删除班级失败：${err}`);
+    }
+  }
+
+  // 学员转班
+  async changeClass(ctx, next) {
+    try {
+      const res = await changeStudentClass(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `学员转班失败：${err}`);
     }
   }
 }

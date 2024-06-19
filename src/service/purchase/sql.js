@@ -19,6 +19,7 @@ const addPurchaseRecordSql = (data) => {
     studentId,
     realPrice,
     payId,
+    eachCoursePrice,
   } = data || {};
 
   if (!payId) {
@@ -33,6 +34,7 @@ const addPurchaseRecordSql = (data) => {
         payment,
         [`${toUnderline("totalPayment")}`]: totalPayment,
         [`${toUnderline("remainCost")}`]: payment,
+        [`${toUnderline("originPrice")}`]: eachCoursePrice,
       })
       .insert();
   } else {

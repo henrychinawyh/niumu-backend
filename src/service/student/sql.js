@@ -7,7 +7,6 @@ const {
   toUnderline,
 } = require("../../utils/database");
 const { where } = require("sequelize");
-const { omit } = require("radash");
 
 // 查询学生列表SQL
 const queryStudentSql = (data) => {
@@ -29,6 +28,9 @@ const queryStudentSql = (data) => {
       "age",
       "school_name AS schoolName",
       "has_cousin AS hasCousin",
+      "is_member AS isMember",
+      "discount",
+      `${TABLENAME.FAMILY}.family_name AS familyName`,
     ])
     .join([
       {
@@ -36,6 +38,13 @@ const queryStudentSql = (data) => {
         table: TABLENAME.FAMILYMEMBER,
         where: {
           [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.FAMILYMEMBER}.student_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.FAMILY,
+        where: {
+          [`${TABLENAME.FAMILYMEMBER}.family_id`]: [`${TABLENAME.FAMILY}.id`],
         },
       },
     ])

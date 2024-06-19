@@ -1,12 +1,7 @@
-const { exec, sql, transaction } = require("../../db/seq");
+const { exec, transaction } = require("../../db/seq");
 const { transformData, getTreeDataByLayer } = require("../../utils");
-const { TABLENAME, SEMESTER } = require("../../utils/constant");
-const {
-  toUnderlineData,
-  getQueryData,
-  convertListToSelectOption,
-  compareArrayWithMin,
-} = require("../../utils/database");
+const { SEMESTER } = require("../../utils/constant");
+const { compareArrayWithMin } = require("../../utils/database");
 const {
   hasCourseSql,
   insertCourseSql,
@@ -24,6 +19,7 @@ const {
   getAllSubjectsSql,
   queryCourseStuTotalSql,
   queryGradeStuTotalSql,
+  queryCouresDetailSql,
 } = require("./sql");
 
 // 添加课程
@@ -256,10 +252,29 @@ const getAllSubjects = async (data) => {
       status: 200,
     };
   } catch (err) {
-    console.log(err);
     return {
       status: 500,
       message: err?.sqlMessage || err,
+    };
+  }
+};
+
+// 查询课程-季度-级别信息
+const queryCouresDetail = async (data) => {
+  try {
+    const res = await exec(queryCouresDetailSql(data));
+
+    console.log(res);
+
+    return {
+      status: 200,
+      data: res,
+      message: "查询成功",
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err,
     };
   }
 };
@@ -275,4 +290,5 @@ module.exports = {
   getAllCourses,
   getAllSubjects,
   addGrade,
+  queryCouresDetail,
 };

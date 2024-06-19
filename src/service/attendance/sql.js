@@ -23,9 +23,11 @@ const queryAttendanceListSql = (data) => {
       `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_cost AS remainCost`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.real_price AS realPrice`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.origin_price AS originPrice`,
       `${TABLENAME.FAMILY}.is_member AS isMember`,
       `${TABLENAME.FAMILY}.discount AS discount`,
       `${TABLENAME.FAMILY}.account_balance AS accountBalance`,
+      `${TABLENAME.FAMILY}.id AS familyId`,
     ])
     .join([
       {

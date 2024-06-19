@@ -10,6 +10,7 @@ const {
   getAllCourses,
   getAllSubjects,
   addGrade,
+  queryCouresDetail,
 } = require("../../service/course");
 
 class CourseController {
@@ -115,7 +116,18 @@ class CourseController {
 
       commonResult(ctx, res);
     } catch (err) {
-      commonServerWrongResult(ctx, `编辑课程级别失败：${err}`);
+      commonServerWrongResult(ctx, ` 获取课程-级别-班级信息失败：${err}`);
+    }
+  }
+
+  // 查询课程-季度-级别详情
+  async getCourseDetail(ctx, next) {
+    try {
+      const res = await queryCouresDetail(ctx.request.body);
+
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `获取详情失败：${err}`);
     }
   }
 }

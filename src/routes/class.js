@@ -7,6 +7,7 @@ const {
   hasRemianCourseCount,
   deleteStudentOfClass,
   deleteClass,
+  changeClass,
 } = require("../controlller/class");
 const {
   hasClassNameUnderCourseGrade,
@@ -50,5 +51,8 @@ router.post("/deleteStudentOfClass", deleteStudentOfClass);
 
 // 删除班级
 router.post("/deleteClass", hasClass, deleteClass);
+
+// 学员转班
+router.post("/changeClass", changeClass);
 
 module.exports = router;

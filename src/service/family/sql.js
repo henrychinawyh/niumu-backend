@@ -222,6 +222,53 @@ const rechargeAccountSql = (data) => {
     .update();
 };
 
+// 取消会员资格SQL
+const cancelMemberSql = (data) => {
+  const { familyId } = data;
+  return sql
+    .table(TABLENAME.FAMILY)
+    .data({
+      [toUnderline("isMember")]: 0,
+      discount: 1,
+    })
+    .where({
+      id: familyId,
+      status: 1,
+    })
+    .update();
+};
+
+// 增加消费记录SQL
+const addFamilyPurchaseRecordSql = (data) => {
+  const {
+    familyId,
+    studentId,
+    consumeDetail,
+    isMember,
+    discount,
+    originPrice,
+    actualPrice,
+    consumeNum,
+  } = data || {};
+
+  return sql
+    .table(TABLENAME.FAMILYCOSTRECORD)
+    .data(
+      toUnderlineData({
+        familyId,
+        studentId,
+        consumeDetail,
+        isMember,
+        discount,
+        originPrice,
+        actualPrice,
+        consumeNum,
+        cost: actualPrice,
+      }),
+    )
+    .insert();
+};
+
 module.exports = {
   queryFamilySql,
   addFamilySql,
@@ -234,4 +281,6 @@ module.exports = {
   queryFamilyListTotalSql,
   createMemberSql,
   rechargeAccountSql,
+  cancelMemberSql,
+  addFamilyPurchaseRecordSql,
 };

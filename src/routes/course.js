@@ -10,6 +10,7 @@ const {
   getAll,
   queryAllSubjects,
   addCourseGrade,
+  getCourseDetail,
 } = require("../controlller/course");
 
 const {
@@ -53,5 +54,8 @@ router.post("/editCourseGrade", hasGradeNameUnderCourse, editCourseGrade);
 
 // 查询所有的课程类目
 router.post("/getAllSubjects", queryAllSubjects);
+
+// 查询课程-季度-级别信息
+router.post("/getCourseDetail", getCourseDetail);
 
 module.exports = router;

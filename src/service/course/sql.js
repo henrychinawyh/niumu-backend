@@ -358,6 +358,51 @@ const queryGradeNamesUnderCourseSql = (data) => {
     .select();
 };
 
+// 查询课程-季度-级别信息SQL
+const queryCouresDetailSql = (data) => {
+  const { courseId, courseSemester, gradeId } = data;
+
+  const whereParams = {};
+
+  if (courseId) {
+    whereParams.courseId = courseId;
+  }
+  if (courseSemester) {
+    whereParams.courseSemester = courseSemester;
+  }
+  if (gradeId) {
+    whereParams[`${TABLENAME.COURSEGRADE}.id`] = gradeId;
+  }
+
+  return sql
+    .table(TABLENAME.COURSEGRADE)
+    .field([
+      `${TABLENAME.COURSE}.id AS courseId`,
+      `${TABLENAME.COURSE}.name AS courseName`,
+      `${TABLENAME.COURSEGRADE}.id AS id`,
+      `${TABLENAME.COURSEGRADE}.name AS gradeName`,
+      `${TABLENAME.COURSEGRADE}.course_semester AS courseSemester`,
+      `${TABLENAME.COURSEGRADE}.course_origin_price AS courseOriginPrice`,
+      `${TABLENAME.COURSEGRADE}.each_course_price AS eachCoursePrice`,
+      `${TABLENAME.COURSEGRADE}.course_count AS courseCount`,
+    ])
+    .join({
+      dir: "left",
+      table: TABLENAME.COURSE,
+      where: [
+        {
+          [`${TABLENAME.COURSEGRADE}.course_id`]: [`${TABLENAME.COURSE}.id`],
+        },
+      ],
+    })
+    .where({
+      ...toUnderlineData(whereParams),
+      [`${TABLENAME.COURSE}.status`]: 1,
+      [`${TABLENAME.COURSEGRADE}.status`]: 1,
+    })
+    .select();
+};
+
 module.exports = {
   hasCourseSql,
   insertCourseSql,
@@ -377,4 +422,5 @@ module.exports = {
   queryGradeNamesUnderCourseSql,
   queryCourseStuTotalSql,
   queryGradeStuTotalSql,
+  queryCouresDetailSql,
 };

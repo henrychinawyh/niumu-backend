@@ -10,13 +10,14 @@ const {
   addTeacherForClassSql,
   addStudentsForClassSql,
   queryStudentOfEachClassSql,
-  removeStudentForClassSql,
   editClassNameSql,
   editTeacherForClassSql,
   queryRemianCourseCountSql,
   delStudentSql,
   delClassSql,
   delStudentInAttendanceSql,
+  changeStudentPayClassRecordSql,
+  changeStudentClassSql,
 } = require("./sql");
 const { delTeacherForClassSql } = require("../teacher/sql");
 
@@ -71,7 +72,7 @@ const addClass = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -134,7 +135,7 @@ const getClass = async (data) => {
 
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -157,7 +158,7 @@ const queryStudentOfEachClass = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -210,7 +211,7 @@ const editClassByClassId = async (data) => {
 
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -228,7 +229,7 @@ const queryRemianCourseCount = async (data) => {
     console.log(err);
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -246,7 +247,7 @@ const delStudent = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
     };
   }
 };
@@ -268,7 +269,31 @@ const delClass = async (data) => {
   } catch (err) {
     return {
       status: 500,
-      message: err?.sqlMessage || err,
+      message: err,
+    };
+  }
+};
+
+// 学员转班
+const changeStudentClass = async (data) => {
+  try {
+    // 修改学员与班级之间的关系
+    // 修改学员购买课程的记录
+    await transaction([
+      changeStudentClassSql(data),
+      changeStudentPayClassRecordSql(data),
+    ]);
+
+    return {
+      status: 200,
+      data: true,
+      message: "操作成功",
+    };
+  } catch (err) {
+    console.log(err);
+    return {
+      status: 500,
+      message: err,
     };
   }
 };
@@ -281,4 +306,5 @@ module.exports = {
   queryRemianCourseCount,
   delStudent,
   delClass,
+  changeStudentClass,
 };

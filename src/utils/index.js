@@ -1,4 +1,5 @@
 const { SEMESTER } = require("./constant");
+const { compareArrayWithMin } = require("./database");
 
 // 将所有的课程类目转换为树形结构
 const transformData = (data) => {
@@ -106,9 +107,19 @@ const removeQuotesFromCalculations = (sql) => {
   return modifiedSql;
 };
 
+// 返回一个对象的响应
+const responseObject = (data) => {
+  if (compareArrayWithMin(data, "===", 1)) {
+    return data[0];
+  }
+
+  return null;
+};
+
 module.exports = {
   transformData,
   toFixed,
   removeQuotesFromCalculations,
   getTreeDataByLayer,
+  responseObject,
 };

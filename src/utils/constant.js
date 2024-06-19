@@ -19,6 +19,7 @@ const TABLENAME = {
   STUDENTATTENDCOURSERECORD: "student_attend_course_record",
   FAMILY: "family",
   FAMILYMEMBER: "family_member",
+  FAMILYCOSTRECORD: "family_cost_record",
 };
 
 // 空数据

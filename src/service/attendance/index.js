@@ -76,7 +76,7 @@ const createAttendanceRecord = async (data) => {
     const accountRes = await exec(queryAccountBalanceSql(data));
     const accountBalance = responseObject(accountRes)?.accountBalance;
 
-    if (+accountBalance && accountBalance < data?.realPrice) {
+    if (+accountBalance && +accountBalance < +data?.realPrice) {
       return {
         status: 500,
         message: "余额不足无法销课，请先充值",

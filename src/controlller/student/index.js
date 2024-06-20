@@ -100,7 +100,6 @@ class StudentController {
           "手机号",
           "身份证号",
           "生日",
-          "入学时间",
         ];
         const dataArr = res.map(
           ({ stuName, phoneNumber, sex, idCard, birthDate, createTs, age }) => [
@@ -110,7 +109,6 @@ class StudentController {
             phoneNumber,
             idCard,
             dayjs(birthDate).format("YYYY-MM-DD"),
-            dayjs(createTs).format("YYYY-MM-DD"),
           ],
         );
 

@@ -5,6 +5,7 @@ const {
   queryOneStudent,
   exportStu,
   edit,
+  querySurplus,
 } = require("../../service/student");
 const { GENDER } = require("../../utils/constant");
 const { exportExcel } = require("../../utils/export");
@@ -122,6 +123,19 @@ class StudentController {
     } catch (err) {
       console.log(err);
       commonServerWrongResult(ctx, `导出学生表失败：${err}`);
+    }
+  }
+
+  // 查询剩余课销
+  async getSurplus(ctx, next) {
+    try {
+      const res = await querySurplus(ctx.request.body);
+      commonResult(ctx, {
+        status: 200,
+        data: res,
+      });
+    } catch (err) {
+      commonServerWrongResult(ctx, `查询剩余课销失败：${err}`);
     }
   }
 }

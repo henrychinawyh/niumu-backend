@@ -6,6 +6,7 @@ const {
   deleteStudent,
   getStudent,
   exportStudent,
+  getSurplus,
 } = require("../controlller/student");
 const { checkSameStu } = require("../middleware/student.middleware");
 
@@ -30,5 +31,8 @@ router.post("/getStudent", getStudent);
 
 // 导出学生表
 router.post("/exportStudent", exportStudent);
+
+// 查询剩余课销
+router.post("/getSurplus", getSurplus);
 
 module.exports = router;

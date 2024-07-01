@@ -147,6 +147,62 @@ const exportStuSql = (data) => {
     .select();
 };
 
+// 查询学员剩余课销Sql
+const querySurplusSql = (data) => {
+  const { id } = data || {};
+
+  return sql
+    .table(TABLENAME.STUDENTPAYCLASSRECORD)
+    .field([
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_cost AS remainCost`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS id`,
+      `${TABLENAME.CLASS}.name AS className`,
+      `${TABLENAME.COURSE}.id AS courseId`,
+      `${TABLENAME.COURSE}.name AS courseName`,
+      `${TABLENAME.COURSEGRADE}.id AS gradeId`,
+      `${TABLENAME.COURSEGRADE}.course_semester AS courseSemester`,
+      `${TABLENAME.COURSEGRADE}.name AS gradeName`,
+    ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTCLASS,
+        where: {
+          [`${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`]: [
+            `${TABLENAME.STUDENTCLASS}.id`,
+          ],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.CLASS,
+        where: {
+          [`${TABLENAME.STUDENTCLASS}.class_id`]: [`${TABLENAME.CLASS}.id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.COURSEGRADE,
+        where: {
+          [`${TABLENAME.CLASS}.grade_id`]: [`${TABLENAME.COURSEGRADE}.id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.COURSE,
+        where: {
+          [`${TABLENAME.COURSEGRADE}.course_id`]: [`${TABLENAME.COURSE}.id`],
+        },
+      },
+    ])
+    .where({
+      [`${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`]: id,
+      [`${TABLENAME.STUDENTPAYCLASSRECORD}.status`]: 1,
+    })
+    .select();
+};
+
 module.exports = {
   queryStudentSql,
   queryStudentListTotalSql,
@@ -156,4 +212,5 @@ module.exports = {
   removeStudentSql,
   exportStuSql,
   queryStudentByIdCardSql,
+  querySurplusSql,
 };

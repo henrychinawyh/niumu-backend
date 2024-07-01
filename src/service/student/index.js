@@ -20,6 +20,7 @@ const {
   removeStudentSql,
   exportStuSql,
   addStudentSql,
+  querySurplusSql,
 } = require("./sql");
 
 // 查询学生
@@ -189,6 +190,17 @@ const exportStu = async (data) => {
   }
 };
 
+// 查询课销
+const querySurplus = async (data) => {
+  try {
+    const res = await exec(querySurplusSql(data));
+
+    return res;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   queryStudent,
   addStudent,
@@ -196,4 +208,5 @@ module.exports = {
   queryOneStudent,
   exportStu,
   edit,
+  querySurplus,
 };

@@ -31,6 +31,7 @@ const queryStudentSql = (data) => {
       "is_member AS isMember",
       "discount",
       `${TABLENAME.FAMILY}.family_name AS familyName`,
+      `${TABLENAME.FAMILY}.id AS familyId`,
     ])
     .join([
       {

@@ -92,6 +92,7 @@ const removeFamilyMemberSql = (data) => {
     .table(TABLENAME.FAMILYMEMBER)
     .data({
       status: 99,
+      is_main: 0,
     })
     .where(toUnderlineData(data))
     .update();

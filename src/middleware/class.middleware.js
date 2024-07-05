@@ -1,5 +1,9 @@
 const { exec } = require("mysqls");
-const { hasClassByIdSql, hasClassByNameSql } = require("../service/class/sql");
+const {
+  hasClassByIdSql,
+  hasClassByNameSql,
+  hasStudentInClassSql,
+} = require("../service/class/sql");
 const { compareArrayWithMin } = require("../utils/database");
 const { commonResult } = require("../controlller/common");
 
@@ -46,7 +50,31 @@ const hasClassNameUnderCourseGrade = async (ctx, next) => {
   await next();
 };
 
+// 转班前查询转移的目标班级下是否已存在这个学员
+const queryStudentInClassBeforeChangeClass = async (ctx, next) => {
+  const data = ctx.request.body;
+
+  const res = await exec(
+    hasStudentInClassSql({
+      classId: data?.classId,
+      studentId: data?.studentId,
+      status: 1,
+    }),
+  );
+
+  if (compareArrayWithMin(res)) {
+    commonResult(ctx, {
+      message: `学员已存在目标班级中，请勿重复添加`,
+      status: 500,
+    });
+    return;
+  }
+
+  await next();
+};
+
 module.exports = {
   hasClass,
   hasClassNameUnderCourseGrade,
+  queryStudentInClassBeforeChangeClass,
 };

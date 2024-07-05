@@ -82,6 +82,7 @@ const addStudent = async (data) => {
             addFamilyMemberSql({
               studentId,
               familyId: list[0].id,
+              mainMemberId: data?.idCard,
             }),
           );
         }

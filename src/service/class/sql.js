@@ -540,26 +540,32 @@ const changeStudentClassSql = (data) => {
 
 // 修改学员购买课程的记录
 const changeStudentPayClassRecordSql = (data) => {
-  const { studentId, payment, studentClassId, courseCount, realPrice, payId } =
-    data || {};
+  const { payment, courseCount, realPrice, payId, classId } = data || {};
 
   return sql
     .table(TABLENAME.STUDENTPAYCLASSRECORD)
     .data({
       remain_course_count: courseCount,
-      remain_cost: realPrice,
+      remain_cost: payment,
       payment: payment,
       total_payment: payment,
       real_price: realPrice,
       paid_course_count: courseCount,
-      student_class_id: studentClassId,
+      student_class_id: classId,
     })
     .where({
-      student_id: studentId,
       id: payId,
       status: 1,
     })
     .update();
+};
+
+// 查询单个学员是否存在于某个班级中Sql
+const hasStudentInClassSql = (data) => {
+  return sql
+    .table(TABLENAME.STUDENTCLASS)
+    .where(toUnderlineData(data))
+    .select();
 };
 
 module.exports = {
@@ -583,4 +589,5 @@ module.exports = {
   delStudentInAttendanceSql,
   changeStudentClassSql,
   changeStudentPayClassRecordSql,
+  hasStudentInClassSql,
 };

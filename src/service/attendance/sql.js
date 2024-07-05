@@ -11,6 +11,8 @@ const { toUnderline } = require("../../utils/database");
 const queryAttendanceListSql = (data) => {
   const { classId, current, pageSize } = data;
 
+  console.log(classId);
+
   return sql
     .table(TABLENAME.STUDENTCLASS)
     .field([
@@ -151,7 +153,8 @@ const updatePayClassRecordSql = (data) => {
 };
 
 const queryAttendanceRecordSql = (data) => {
-  const { id, costTimeStart, costTimeEnd } = data;
+  const { id, costTimeStart, costTimeEnd, classId } = data;
+
   return sql
     .table(TABLENAME.STUDENTATTENDCOURSERECORD)
     .field(["attend_date as attendDate"])
@@ -161,6 +164,7 @@ const queryAttendanceRecordSql = (data) => {
       [`${toUnderline("attendDate")}`]: {
         between: [`'${costTimeStart}'`, `'${costTimeEnd}'`].join(","),
       },
+      class_id: classId,
     })
     .select();
 };

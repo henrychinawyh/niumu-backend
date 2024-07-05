@@ -12,6 +12,7 @@ const {
 const {
   hasClassNameUnderCourseGrade,
   hasClass,
+  queryStudentInClassBeforeChangeClass,
 } = require("../middleware/class.middleware");
 const {
   hasStudentsInSameCourseGrade,
@@ -53,6 +54,6 @@ router.post("/deleteStudentOfClass", deleteStudentOfClass);
 router.post("/deleteClass", hasClass, deleteClass);
 
 // 学员转班
-router.post("/changeClass", changeClass);
+router.post("/changeClass", queryStudentInClassBeforeChangeClass, changeClass);
 
 module.exports = router;

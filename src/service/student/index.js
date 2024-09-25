@@ -55,33 +55,28 @@ const queryOneStudent = async (data) => {
 // 新建学生
 const addStudent = async (data) => {
   try {
-    const [res, student] = await transaction([
+    const res = await exec(
       addStudentSql(omit(data, ["relateWay", "familyId", "familyName"])),
-      queryStudentSql({
-        idCard: data?.idCard,
-      }),
-    ]);
+    );
 
-    const { id: studentId } = student?.[0] || {};
+    let studentId = res?.insertId;
 
-    if (data?.relateWay) {
+    if (data?.relateWay && studentId) {
       // 新建家庭
       if (data?.relateWay === "0") {
-        const [res1, list] = await transaction([
+        const { insertId } = await exec(
           addFamilySql({
             familyName: data?.familyName,
             mainMemberId: data?.idCard,
           }),
-          queryFamilySql({
-            mainMemberId: data?.idCard,
-          }),
-        ]);
-        if (list?.length > 0) {
+        );
+
+        if (insertId) {
           // 添加家庭与学生的关系
           await exec(
             addFamilyMemberSql({
               studentId,
-              familyId: list[0].id,
+              familyId: insertId,
               mainMemberId: data?.idCard,
             }),
           );

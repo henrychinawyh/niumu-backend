@@ -16,10 +16,15 @@ const {
   delStudentSql,
   delClassSql,
   delStudentInAttendanceSql,
-  changeStudentPayClassRecordSql,
+  banStudentPayClassRecordSql,
   changeStudentClassSql,
+  queryClassDetailSql,
+  queryStudentTotalOfEachClassSql,
+  addStudentToClassSql,
 } = require("./sql");
+const { addPurchaseRecordSql } = require("../purchase/sql");
 const { delTeacherForClassSql } = require("../teacher/sql");
+const { omit } = require("lodash");
 
 /**
  * @name 查询添加的学员是否已在同课程同级别下的班级已存在
@@ -40,16 +45,12 @@ const addClass = async (data) => {
 
   try {
     // 添加班级
-    const addClassRes = await transaction([
-      addClassSql(data),
-      queryClassByIdSql(data),
-    ]);
+    // 新建班级
+    const { insertId } = await exec(addClassSql(data));
 
-    const [addRes, searchRes] = addClassRes || [];
-
-    if (compareArrayWithMin(searchRes, ">", 0)) {
+    if (insertId) {
       // 查找到了班级
-      const classId = searchRes[0].id;
+      const classId = insertId;
 
       await transaction([
         // 将老师关联到班级中
@@ -98,38 +99,23 @@ const getClass = async (data) => {
       queryClassTotalSql(data), // 查询班级列表的总数
     ]);
 
-    if (Array.isArray(list) && list.length) {
-      // 查询每个班级的学员
-      const [studentList] = await transaction([
-        queryStudentOfEachClassSql({
-          list: list?.map((item) => item?.classId),
-        }),
-      ]);
+    // 查询班级人数
+    const studentTotal = await exec(queryStudentTotalOfEachClassSql(list));
 
-      // 根据查询到的班级，去查询班级里的人数
-      list.forEach((item) => {
-        const { classId } = item;
-
-        const students = (studentList || [])?.filter(
-          (student) => student?.classId === classId,
-        );
-
-        item.studentList = students;
-        item.total = students?.length;
-      });
-
-      return {
-        data: {
-          list,
-          current,
-          pageSize,
-          total: total?.[0]?.total || 0,
-        },
-        message: "查询成功",
-      };
-    } else {
-      return EMPTY_DATA.LIST(current, pageSize);
-    }
+    return {
+      data: {
+        list: list.map((item, index) => ({
+          ...item,
+          studentTotal: studentTotal?.find(
+            (totalItem) => totalItem?.classId === item?.classId,
+          )?.total,
+        })),
+        total,
+        current,
+        pageSize,
+      },
+      status: 200,
+    };
   } catch (err) {
     console.log(err);
 
@@ -173,27 +159,7 @@ const queryStudentOfEachClass = async (data) => {
  */
 const editClassByClassId = async (data) => {
   try {
-    const { classId, studentIds } = data;
-
-    let addStus = [];
-
-    // 1. 查询班级下已存在的学员
-    const res = await exec(queryStudentOfEachClassSql({ list: [classId] }));
-    if (Array.isArray(res)) {
-      const idList = res.map((item) => item.studentId);
-      // 要新增的数据
-      addStus = diff(studentIds, idList);
-    }
-
-    // 3. 执行新增数据的操作
-    if (addStus?.length) {
-      await transaction([
-        ...addStudentsForClassSql({
-          studentIds: addStus,
-          classId,
-        }),
-      ]);
-    }
+    console.log(data, "data");
 
     // 修改班级名称和任课教师
     await transaction([
@@ -220,7 +186,7 @@ const editClassByClassId = async (data) => {
 const queryRemianCourseCount = async (data) => {
   try {
     const res = await exec(queryRemianCourseCountSql(data));
-    console.log(res, data, "res");
+
     return {
       status: 200,
       data: res || [],
@@ -278,11 +244,23 @@ const delClass = async (data) => {
 const changeStudentClass = async (data) => {
   try {
     // 修改学员与班级之间的关系
-    // 修改学员购买课程的记录
-    await transaction([
-      changeStudentClassSql(data),
-      changeStudentPayClassRecordSql(data),
-    ]);
+    // 将之前的班级的购买记录设置为失效
+    // 再添加新的课程购买记录
+
+    if (data?.payId) {
+      await transaction([
+        changeStudentClassSql(data),
+        banStudentPayClassRecordSql(data),
+        // 添加新的购买记录
+        addPurchaseRecordSql(omit(data, "payId")),
+      ]);
+    } else {
+      await transaction([
+        changeStudentClassSql(data),
+        // 添加新的购买记录
+        addPurchaseRecordSql(omit(data, "payId")),
+      ]);
+    }
 
     return {
       status: 200,
@@ -291,6 +269,44 @@ const changeStudentClass = async (data) => {
     };
   } catch (err) {
     console.log(err);
+    return {
+      status: 500,
+      message: err,
+    };
+  }
+};
+
+// 查询班级详情
+const queryClassesDetail = async (data) => {
+  try {
+    const res = await exec(queryClassDetailSql(data));
+
+    return {
+      status: 200,
+      data: {
+        list: res || [],
+        total: res?.length || 0,
+      },
+    };
+  } catch (err) {
+    return {
+      status: 500,
+      message: err,
+    };
+  }
+};
+
+// 给班级添加学员
+const addStudentToClass = async (data) => {
+  try {
+    await transaction(addStudentToClassSql(data));
+
+    return {
+      status: 200,
+      data: true,
+      message: "操作成功",
+    };
+  } catch (err) {
     return {
       status: 500,
       message: err,
@@ -307,4 +323,6 @@ module.exports = {
   delStudent,
   delClass,
   changeStudentClass,
+  queryClassesDetail,
+  addStudentToClass,
 };

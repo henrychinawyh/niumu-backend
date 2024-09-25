@@ -112,7 +112,11 @@ const editSql = (data) => {
 
   return sql
     .table(TABLENAME.STUDENT)
-    .data(toUnderlineData(rest))
+    .data({
+      ...toUnderlineData(rest),
+      has_cousin: rest.hasCousin || "",
+      school_name: rest.schoolName || "",
+    })
     .where({
       id,
     })

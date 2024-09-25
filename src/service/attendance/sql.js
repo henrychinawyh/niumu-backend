@@ -11,13 +11,14 @@ const { toUnderline } = require("../../utils/database");
 const queryAttendanceListSql = (data) => {
   const { classId, current, pageSize } = data;
 
-  console.log(classId);
+  console.log(classId, "classId");
 
   return sql
     .table(TABLENAME.STUDENTCLASS)
     .field([
       `${TABLENAME.STUDENTCLASS}.id AS id`,
       `${TABLENAME.STUDENTCLASS}.class_id AS classId`,
+      `${TABLENAME.STUDENTCLASS}.status AS status`,
       `${TABLENAME.STUDENT}.id AS studentId`,
       `${TABLENAME.STUDENT}.stu_name AS studentName`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS payId`,
@@ -34,20 +35,9 @@ const queryAttendanceListSql = (data) => {
     .join([
       {
         dir: "left",
-        table: TABLENAME.STUDENTPAYCLASSRECORD,
-        where: {
-          [`${TABLENAME.STUDENTCLASS}.id`]: [
-            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
-          ],
-        },
-      },
-      {
-        dir: "right",
         table: TABLENAME.STUDENT,
         where: {
-          [`${TABLENAME.STUDENT}.id`]: [
-            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
-          ],
+          [`${TABLENAME.STUDENTCLASS}.student_id`]: [`${TABLENAME.STUDENT}.id`],
         },
       },
       {
@@ -64,11 +54,20 @@ const queryAttendanceListSql = (data) => {
           [`${TABLENAME.FAMILY}.id`]: [`${TABLENAME.FAMILYMEMBER}.family_id`],
         },
       },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTPAYCLASSRECORD,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          ],
+        },
+      },
     ])
     .page(current, pageSize)
     .where({
       [`${TABLENAME.STUDENTCLASS}.class_id`]: classId,
-      [`${TABLENAME.STUDENTPAYCLASSRECORD}.status`]: 1,
+      // [`${TABLENAME.STUDENTPAYCLASSRECORD}.status`]: 1,
     })
     .select();
 };

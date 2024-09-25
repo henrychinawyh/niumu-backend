@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const { exec, sql, transaction } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const {
@@ -141,7 +142,7 @@ const delStudentInAttendanceSql = (data) => {
     .table(TABLENAME.STUDENTPAYCLASSRECORD)
     .data({ status: 99 })
     .where({
-      [`${toUnderline("studentId")}`]: studentId,
+      student_id: studentId,
     })
     .update();
 };
@@ -350,6 +351,9 @@ const queryStudentOfEachClassSql = (data) => {
           [`${TABLENAME.STUDENTCLASS}.id`]: [
             `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
           ],
+          [`${TABLENAME.STUDENTCLASS}.student_id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          ],
         },
       },
     ])
@@ -358,6 +362,7 @@ const queryStudentOfEachClassSql = (data) => {
         in: list?.join(","),
       },
       [`${TABLENAME.STUDENTCLASS}.status`]: 1,
+      [`${TABLENAME.STUDENTPAYCLASSRECORD}.status`]: 1,
     })
     .select();
 };
@@ -368,7 +373,7 @@ const queryStudentOfEachClassSql = (data) => {
 const queryStudentTotalOfEachClassSql = (list) => {
   return sql
     .table(TABLENAME.STUDENTCLASS)
-    .field(["count(*) AS total"])
+    .field(["count(*) AS total", "class_id AS classId"])
     .where({
       [toUnderline("classId")]: {
         in: list?.map((item) => item.classId).join(","),
@@ -539,19 +544,13 @@ const changeStudentClassSql = (data) => {
 };
 
 // 修改学员购买课程的记录
-const changeStudentPayClassRecordSql = (data) => {
-  const { payment, courseCount, realPrice, payId, classId } = data || {};
+const banStudentPayClassRecordSql = (data) => {
+  const { payId } = data || {};
 
   return sql
     .table(TABLENAME.STUDENTPAYCLASSRECORD)
     .data({
-      remain_course_count: courseCount,
-      remain_cost: payment,
-      payment: payment,
-      total_payment: payment,
-      real_price: realPrice,
-      paid_course_count: courseCount,
-      student_class_id: classId,
+      status: 99,
     })
     .where({
       id: payId,
@@ -568,8 +567,91 @@ const hasStudentInClassSql = (data) => {
     .select();
 };
 
+// 查看班级详情
+const queryClassDetailSql = (data) => {
+  // 班级id
+  const { id } = data;
+
+  return sql
+    .table(TABLENAME.CLASS)
+    .field([
+      `${TABLENAME.STUDENT}.id AS id`,
+      `${TABLENAME.STUDENT}.stu_name AS stuName`,
+      `${TABLENAME.STUDENT}.sex AS sex`,
+      `${TABLENAME.STUDENT}.birth_date AS birthDate`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS emianCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.payment AS payment`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS payId`,
+      `${TABLENAME.FAMILY}.account_balance AS accountBalance`,
+      `${TABLENAME.FAMILY}.is_member AS isMember`,
+      `${TABLENAME.FAMILY}.discount AS discount`,
+    ])
+    .join([
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTCLASS,
+        where: {
+          [`${TABLENAME.CLASS}.id`]: [`${TABLENAME.STUDENTCLASS}.class_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENT,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.STUDENTCLASS}.student_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.FAMILYMEMBER,
+        where: {
+          [`${TABLENAME.STUDENT}.id`]: [`${TABLENAME.FAMILYMEMBER}.student_id`],
+        },
+      },
+      {
+        dir: "right",
+        table: TABLENAME.FAMILY,
+        where: {
+          [`${TABLENAME.FAMILY}.id`]: [`${TABLENAME.FAMILYMEMBER}.family_id`],
+        },
+      },
+      {
+        dir: "left",
+        table: TABLENAME.STUDENTPAYCLASSRECORD,
+        where: {
+          [`${TABLENAME.STUDENTCLASS}.student_id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          ],
+        },
+      },
+    ])
+    .where({
+      [`${TABLENAME.STUDENTCLASS}.status`]: 1,
+      [`${TABLENAME.CLASS}.id`]: id,
+      [`${TABLENAME.FAMILY}.status`]: 1,
+      [`${TABLENAME.FAMILYMEMBER}.status`]: 1,
+    })
+    .select();
+};
+
+// 为班级添加学员
+const addStudentToClassSql = (data) => {
+  const { studentIds, classId } = data || {};
+
+  return studentIds?.map((item) =>
+    sql
+      .table(TABLENAME.STUDENTCLASS)
+      .data({
+        student_id: item,
+        class_id: classId,
+      })
+      .insert(),
+  );
+};
+
 module.exports = {
   hasClassByNameSql,
+  queryClassDetailSql,
   hasClassByIdSql,
   addClassSql,
   queryClassSql,
@@ -588,6 +670,7 @@ module.exports = {
   delClassSql,
   delStudentInAttendanceSql,
   changeStudentClassSql,
-  changeStudentPayClassRecordSql,
+  banStudentPayClassRecordSql,
   hasStudentInClassSql,
+  addStudentToClassSql,
 };

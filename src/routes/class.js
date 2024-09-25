@@ -8,6 +8,8 @@ const {
   deleteStudentOfClass,
   deleteClass,
   changeClass,
+  getClassesDetail,
+  addStudent,
 } = require("../controlller/class");
 const {
   hasClassNameUnderCourseGrade,
@@ -37,12 +39,7 @@ router.post("/getClassList", getClassList);
 router.post("/getStudentsInClass", getStudentsInClass);
 
 // 编辑班级
-router.post(
-  "/editClass",
-  hasClassNameUnderCourseGrade,
-  hasStudentsInSameCourseGrade,
-  editClass,
-);
+router.post("/editClass", editClass);
 
 // 检查某个学员在班级中未销课时
 router.post("/hasRemianCourseCount", hasRemianCourseCount);
@@ -55,5 +52,11 @@ router.post("/deleteClass", hasClass, deleteClass);
 
 // 学员转班
 router.post("/changeClass", queryStudentInClassBeforeChangeClass, changeClass);
+
+// 查询班级详情
+router.post("/getClassesDetail", getClassesDetail);
+
+// 给班级增加学员
+router.post("/addStudentToClass", hasStudentsInSameCourseGrade, addStudent);
 
 module.exports = router;

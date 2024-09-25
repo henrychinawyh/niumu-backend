@@ -7,6 +7,8 @@ const {
   delStudent,
   delClass,
   changeStudentClass,
+  queryClassesDetail,
+  addStudentToClass,
 } = require("../../service/class");
 const { commonResult, commonServerWrongResult } = require("../common");
 
@@ -88,6 +90,26 @@ class ClassController {
   async changeClass(ctx, next) {
     try {
       const res = await changeStudentClass(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `学员转班失败：${err}`);
+    }
+  }
+
+  // 查询班级详情
+  async getClassesDetail(ctx, next) {
+    try {
+      const res = await queryClassesDetail(ctx.request.body);
+      commonResult(ctx, res);
+    } catch (err) {
+      commonServerWrongResult(ctx, `学员转班失败：${err}`);
+    }
+  }
+
+  // 查询班级详情
+  async addStudent(ctx, next) {
+    try {
+      const res = await addStudentToClass(ctx.request.body);
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `学员转班失败：${err}`);

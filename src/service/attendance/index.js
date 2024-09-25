@@ -27,7 +27,7 @@ const queryAttendanceList = async (data) => {
 
     const [list, totalRes] = res || [];
 
-    console.log(list, "list");
+    console.log(res, "res");
 
     // 查询每个学员考勤的时间
     const attendanceRecords =
@@ -43,8 +43,6 @@ const queryAttendanceList = async (data) => {
             ),
           )
         : [];
-
-    console.log(attendanceRecords, "attendanceRecords");
 
     attendanceRecords?.forEach((item, index) => {
       list[index].attendanceRecords = item?.map((i) =>

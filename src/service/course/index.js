@@ -35,16 +35,10 @@ const addCourse = async (data) => {
 
   try {
     // 插入课程并查询课程id
-    const insertRes = await transaction([
-      insertCourseSql(data),
-      queryCourseId(data),
-    ]);
-
-    const selectResData = insertRes?.[1];
-    const { id } = selectResData[0];
+    const { insertId } = await exec(insertCourseSql(data));
 
     // 插入课程级别
-    await transaction(batchInsertCourseGradeSql(data, id));
+    await transaction(batchInsertCourseGradeSql(data, insertId));
 
     return {
       status: 200,

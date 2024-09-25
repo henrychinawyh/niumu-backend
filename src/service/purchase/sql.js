@@ -43,9 +43,9 @@ const addPurchaseRecordSql = (data) => {
     ${toUnderline("paidCourseCount")}=${toUnderline("paidCourseCount")}+${paidCourseCount},
     ${toUnderline("remainCourseCount")}=${toUnderline("remainCourseCount")}+${paidCourseCount},
     ${toUnderline("realPrice")}=${realPrice},
-    payment=${payment},
-    ${toUnderline("remainCost")}=${payment},
-    ${toUnderline("totalPayment")}=${toUnderline("totalPayment")}+${payment}
+    payment=payment+${payment},
+    ${toUnderline("remainCost")}=${toUnderline("remainCost")}+${payment},
+    ${toUnderline("totalPayment")}=${toUnderline("totalPayment")}+${totalPayment}
     WHERE id=${payId}
     `;
   }

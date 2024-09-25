@@ -56,19 +56,14 @@ const queryFamilyList = async (data) => {
 const addFamily = async (data) => {
   try {
     // 添加家庭
-    const [res, list] = await transaction([
-      addFamilySql(data),
-      queryFamilySql({
-        mainMemberId: data?.mainMemberId,
-      }),
-    ]);
+    const { insertId: familyId } = exec(addFamilySql(data));
 
-    if (list?.length > 0) {
+    if (familyId) {
       // 添加家庭与学生的关系
       await exec(
         addFamilyMemberSql({
           ...data,
-          familyId: list[0].id,
+          familyId,
         }),
       );
 

@@ -27,8 +27,6 @@ const queryAttendanceList = async (data) => {
 
     const [list, totalRes] = res || [];
 
-    console.log(res, "res");
-
     // 查询每个学员考勤的时间
     const attendanceRecords =
       list?.length > 0
@@ -89,7 +87,7 @@ const createAttendanceRecord = async (data) => {
     await transaction(
       [
         // 是否要取消会员
-        +accountBalance === data?.realPrice && cancelMemberSql(data),
+        +accountBalance === +data?.realPrice && cancelMemberSql(data),
         // 增加考勤记录
         createAttendanceRecordSql(data),
         // 更新课销记录

@@ -1,4 +1,3 @@
-const { diff } = require("radash");
 const { exec, transaction, sql } = require("../../db/seq");
 const { EMPTY_DATA, TABLENAME } = require("../../utils/constant");
 const { compareArrayWithMin, toUnderline } = require("../../utils/database");
@@ -16,8 +15,6 @@ const {
   delStudentSql,
   delClassSql,
   delStudentInAttendanceSql,
-  banStudentPayClassRecordSql,
-  changeStudentClassSql,
   queryClassDetailSql,
   queryStudentTotalOfEachClassSql,
   addStudentToClassSql,
@@ -159,8 +156,6 @@ const queryStudentOfEachClass = async (data) => {
  */
 const editClassByClassId = async (data) => {
   try {
-    console.log(data, "data");
-
     // 修改班级名称和任课教师
     await transaction([
       editClassNameSql(data), // 修改班级名称
@@ -243,23 +238,51 @@ const delClass = async (data) => {
 // 学员转班
 const changeStudentClass = async (data) => {
   try {
-    // 修改学员与班级之间的关系
-    // 将之前的班级的购买记录设置为失效
-    // 再添加新的课程购买记录
-
     if (data?.payId) {
-      await transaction([
-        changeStudentClassSql(data),
-        banStudentPayClassRecordSql(data),
-        // 添加新的购买记录
-        addPurchaseRecordSql(omit(data, "payId")),
+      const [res1, res2, res3] = await transaction([
+        // 删除学员与原班级之间的关系
+        // 将之前的班级的购买记录设置为失效
+        delStudentSql(data),
+        delStudentInAttendanceSql(data),
+
+        // 新增学员与现班级之间的关系
+        ...addStudentsForClassSql({
+          classId: data?.classId,
+          studentIds: [data?.studentId],
+        }),
       ]);
+      if (res3?.insertId) {
+        // 添加新的购买记录
+        await exec(
+          addPurchaseRecordSql(
+            Object.assign({}, omit(data, "studentClassId"), {
+              studentClassId: res3?.insertId,
+            }),
+          ),
+        );
+      }
     } else {
-      await transaction([
-        changeStudentClassSql(data),
-        // 添加新的购买记录
-        addPurchaseRecordSql(omit(data, "payId")),
+      const [res1, res2] = await transaction([
+        // 删除学员与原班级之间的关系
+        delStudentSql(data),
+
+        // 新增学员与现班级之间的关系
+        ...addStudentsForClassSql({
+          classId: data?.classId,
+          studentIds: [data?.studentId],
+        }),
       ]);
+
+      if (res2?.insertId) {
+        // 添加新的购买记录
+        await exec(
+          addPurchaseRecordSql(
+            Object.assign({}, omit(data, "studentClassId"), {
+              studentClassId: res2?.insertId,
+            }),
+          ),
+        );
+      }
     }
 
     return {

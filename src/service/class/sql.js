@@ -115,18 +115,17 @@ const removeStudentForClassSql = (data) => {
 };
 
 /**
- * @name 删除单个学生SQL
+ * @name 删除班级下的单个学生SQL
  */
 const delStudentSql = (data) => {
-  const { classId, studentId } = data;
+  const { id } = data;
   return sql
     .table(TABLENAME.STUDENTCLASS)
     .data({
       status: 99,
     })
     .where({
-      [`${toUnderline("classId")}`]: classId,
-      [`${toUnderline("studentId")}`]: studentId,
+      id,
       status: 1,
     })
     .update();
@@ -136,13 +135,14 @@ const delStudentSql = (data) => {
  * @name 删除单个学生考勤SQL
  */
 const delStudentInAttendanceSql = (data) => {
-  const { studentId } = data;
+  const { id } = data;
 
   return sql
     .table(TABLENAME.STUDENTPAYCLASSRECORD)
     .data({ status: 99 })
     .where({
-      student_id: studentId,
+      student_class_id: id,
+      status: 1,
     })
     .update();
 };
@@ -527,38 +527,6 @@ const delClassSql = (data) => {
     .update();
 };
 
-// 切换学员与班级的联系
-const changeStudentClassSql = (data) => {
-  const { studentClassId, classId } = data || {};
-
-  return sql
-    .table(TABLENAME.STUDENTCLASS)
-    .data({
-      [toUnderline("classId")]: classId,
-    })
-    .where({
-      id: studentClassId,
-      status: 1,
-    })
-    .update();
-};
-
-// 修改学员购买课程的记录
-const banStudentPayClassRecordSql = (data) => {
-  const { payId } = data || {};
-
-  return sql
-    .table(TABLENAME.STUDENTPAYCLASSRECORD)
-    .data({
-      status: 99,
-    })
-    .where({
-      id: payId,
-      status: 1,
-    })
-    .update();
-};
-
 // 查询单个学员是否存在于某个班级中Sql
 const hasStudentInClassSql = (data) => {
   return sql
@@ -575,11 +543,14 @@ const queryClassDetailSql = (data) => {
   return sql
     .table(TABLENAME.CLASS)
     .field([
-      `${TABLENAME.STUDENT}.id AS id`,
+      `${TABLENAME.STUDENT}.id AS studentId`,
       `${TABLENAME.STUDENT}.stu_name AS stuName`,
       `${TABLENAME.STUDENT}.sex AS sex`,
       `${TABLENAME.STUDENT}.birth_date AS birthDate`,
-      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS emianCourseCount`,
+      `${TABLENAME.CLASS}.id AS classId`,
+      `${TABLENAME.STUDENTCLASS}.id AS id`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_course_count AS remainCourseCount`,
+      `${TABLENAME.STUDENTPAYCLASSRECORD}.remain_cost AS remainCost`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.payment AS payment`,
       `${TABLENAME.STUDENTPAYCLASSRECORD}.id AS payId`,
       `${TABLENAME.FAMILY}.account_balance AS accountBalance`,
@@ -619,8 +590,8 @@ const queryClassDetailSql = (data) => {
         dir: "left",
         table: TABLENAME.STUDENTPAYCLASSRECORD,
         where: {
-          [`${TABLENAME.STUDENTCLASS}.student_id`]: [
-            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          [`${TABLENAME.STUDENTCLASS}.id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
           ],
         },
       },
@@ -669,8 +640,6 @@ module.exports = {
   delStudentSql,
   delClassSql,
   delStudentInAttendanceSql,
-  changeStudentClassSql,
-  banStudentPayClassRecordSql,
   hasStudentInClassSql,
   addStudentToClassSql,
 };

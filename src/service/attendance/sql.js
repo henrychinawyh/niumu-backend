@@ -11,8 +11,6 @@ const { toUnderline } = require("../../utils/database");
 const queryAttendanceListSql = (data) => {
   const { classId, current, pageSize } = data;
 
-  console.log(classId, "classId");
-
   return sql
     .table(TABLENAME.STUDENTCLASS)
     .field([
@@ -58,8 +56,8 @@ const queryAttendanceListSql = (data) => {
         dir: "left",
         table: TABLENAME.STUDENTPAYCLASSRECORD,
         where: {
-          [`${TABLENAME.STUDENT}.id`]: [
-            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_id`,
+          [`${TABLENAME.STUDENTCLASS}.id`]: [
+            `${TABLENAME.STUDENTPAYCLASSRECORD}.student_class_id`,
           ],
         },
       },

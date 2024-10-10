@@ -88,16 +88,18 @@ const addClass = async (data) => {
  */
 const getClass = async (data) => {
   const { current, pageSize } = data || {};
-
   try {
     // 查询班级
     const [list, total] = await transaction([
       queryClassSql(data), // 查询班级列表
       queryClassTotalSql(data), // 查询班级列表的总数
     ]);
-
     // 查询班级人数
-    const studentTotal = await exec(queryStudentTotalOfEachClassSql(list));
+    let studentTotal = [];
+
+    if (list?.length > 0) {
+      studentTotal = await exec(queryStudentTotalOfEachClassSql(list));
+    }
 
     return {
       data: {
@@ -255,7 +257,7 @@ const changeStudentClass = async (data) => {
         // 添加新的购买记录
         await exec(
           addPurchaseRecordSql(
-            Object.assign({}, omit(data, "studentClassId"), {
+            Object.assign({}, omit(data, ["studentClassId", "payId"]), {
               studentClassId: res3?.insertId,
             }),
           ),

@@ -9,7 +9,7 @@
     "lint": "eslint **/*.js",
     "lint-html": "eslint **/*.js -f html -o ./reports/lint-results.html",
     "lint-fix": "eslint --fix **/*.js",
-    "prepare": "husky init",
+    "prepare": "husky",
     "lint-staged": "lint-staged",
     "commit": "git add . && git cz"
   },

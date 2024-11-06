@@ -1,7 +1,5 @@
 const { omit } = require("radash");
-const { exec, sql, transaction } = require("../../db/seq");
-const { TABLENAME } = require("../../utils/constant");
-const { getQueryData, toUnderlineData } = require("../../utils/database");
+const { exec } = require("../../db/seq");
 const {
   removeFamilyMemberSql,
   queryFamilyMemberByFamilyIdSql,

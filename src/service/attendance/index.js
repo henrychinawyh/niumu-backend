@@ -15,17 +15,13 @@ const {
 } = require("../family/sql");
 const { reduceAccountBalanceSql } = require("../consume/sql/update");
 
-// 获取考勤列表
+// todo 获取考勤列表
 const queryAttendanceList = async (data) => {
   const { current, pageSize, costTimeStart, costTimeEnd } = data;
 
   try {
-    const res = await transaction([
-      queryAttendanceListSql(data),
-      queryAttendanceListTotalSql(data),
-    ]);
-
-    const [list, totalRes] = res || [];
+    const list = await exec(queryAttendanceListSql(data));
+    const totalRes = await exec(queryAttendanceListTotalSql(data));
 
     // 查询每个学员考勤的时间
     const attendanceRecords =

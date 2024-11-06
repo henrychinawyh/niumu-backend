@@ -1,4 +1,4 @@
-const { sql, transaction, exec } = require("../../db/seq");
+const { exec } = require("../../db/seq");
 const { removeQuotesFromCalculations, responseObject } = require("../../utils");
 const { compareArrayWithMin } = require("../../utils/database");
 const {
@@ -59,10 +59,8 @@ const addFamilyPurchaseRecord = async (data) => {
 // 查看学员消费记录
 const getStudentConsumeRecord = async (data) => {
   try {
-    const [list, total] = await transaction([
-      getStudentConsumeRecordSql(data),
-      getStudentConsumeRecordTotalSql(data),
-    ]);
+    const list = await getStudentConsumeRecordSql(data);
+    const total = await getStudentConsumeRecordTotalSql(data);
 
     return {
       status: 200,
@@ -83,10 +81,8 @@ const getStudentConsumeRecord = async (data) => {
 // 查看家庭消费记录
 const getFamilyConsumeRecord = async (data) => {
   try {
-    const [list, total] = await transaction([
-      getFamilyConsumeRecordSql(data),
-      getFamilyConsumeRecordTotalSql(data),
-    ]);
+    const list = await exec(getFamilyConsumeRecordSql(data));
+    const total = await exec(getFamilyConsumeRecordTotalSql(data));
 
     return {
       status: 200,

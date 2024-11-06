@@ -90,10 +90,9 @@ const getClass = async (data) => {
   const { current, pageSize } = data || {};
   try {
     // 查询班级
-    const [list, total] = await transaction([
-      queryClassSql(data), // 查询班级列表
-      queryClassTotalSql(data), // 查询班级列表的总数
-    ]);
+    const list = await exec(queryClassSql(data));
+    const total = await exec(queryClassTotalSql(data));
+
     // 查询班级人数
     let studentTotal = [];
 

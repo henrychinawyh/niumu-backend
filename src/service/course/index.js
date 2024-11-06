@@ -3,9 +3,7 @@ const { transformData, getTreeDataByLayer } = require("../../utils");
 const { SEMESTER } = require("../../utils/constant");
 const { compareArrayWithMin } = require("../../utils/database");
 const {
-  hasCourseSql,
   insertCourseSql,
-  queryCourseId,
   batchInsertCourseGradeSql,
   queryCourseListSql,
   queryCourseListTotalSql,
@@ -57,13 +55,9 @@ const queryCourseList = async (data) => {
   const { current = 1, pageSize = 10 } = data;
 
   try {
-    const res = await transaction([
-      queryCourseListSql(data),
-      queryCourseListTotalSql(data),
-      queryCourseStuTotalSql(data),
-    ]);
-
-    const [list, total, stuTotal] = res || [];
+    const list = await exec(queryCourseListSql(data));
+    const total = await exec(queryCourseListTotalSql(data));
+    const stuTotal = await exec(queryCourseStuTotalSql(data));
 
     if (Array.isArray(list) && list.length) {
       list.forEach((item, index) => {
@@ -140,12 +134,8 @@ const edit = async (data) => {
 // 获取课程下所有的级别
 const getGrade = async (data) => {
   try {
-    const res = await transaction([
-      getGradeSql(data),
-      queryGradeStuTotalSql(data),
-    ]);
-
-    const [grades, stuTotal] = res || [];
+    const grades = await exec(getGradeSql(data));
+    const stuTotal = await exec(queryGradeStuTotalSql(data));
 
     if (compareArrayWithMin(grades)) {
       grades.forEach((item, index) => {

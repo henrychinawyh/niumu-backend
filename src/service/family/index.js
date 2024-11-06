@@ -1,4 +1,4 @@
-const { exec, transaction } = require("../../db/seq");
+const { exec } = require("../../db/seq");
 const { removeQuotesFromCalculations } = require("../../utils");
 const {
   addFamilySql,
@@ -31,10 +31,8 @@ const queryFamily = async (data) => {
 // 查询家庭列表
 const queryFamilyList = async (data) => {
   try {
-    const [list, total] = await transaction([
-      queryFamilySql(data),
-      queryFamilyListTotalSql(data),
-    ]);
+    const list = await exec(queryFamilySql(data));
+    const total = await exec(queryFamilyListTotalSql(data));
 
     return {
       status: 200,
@@ -56,7 +54,7 @@ const queryFamilyList = async (data) => {
 const addFamily = async (data) => {
   try {
     // 添加家庭
-    const { insertId: familyId } = exec(addFamilySql(data));
+    const { insertId: familyId } = await exec(addFamilySql(data));
 
     if (familyId) {
       // 添加家庭与学生的关系

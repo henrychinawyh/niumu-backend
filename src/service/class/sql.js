@@ -1,12 +1,8 @@
-const { where } = require("sequelize");
-const { exec, sql, transaction } = require("../../db/seq");
+const { sql } = require("../../db/seq");
 const { TABLENAME } = require("../../utils/constant");
 const {
   toUnderlineData,
-  compareArrayWithMin,
-  getQueryData,
   convertIfNull,
-  convertJoinWhere,
   toUnderline,
   handleGroupBy,
 } = require("../../utils/database");

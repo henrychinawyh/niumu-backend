@@ -7,11 +7,11 @@ WORKDIR /app
 # 复制 package.json 和 package-lock.json
 COPY package*.json ./
 
-# 安装依赖
-RUN npm install
-
 # 安装 PM2
 RUN npm install pm2 -g
+
+# 安装依赖
+RUN npm install
 
 # 复制项目文件到工作目录
 COPY . .
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 3000
 
 # 启动应用
-CMD ["pm2-runtime", "start", 'src/main.js']
+CMD ["pm2-runtime", "start", './ecosystem.config.js']

@@ -1,5 +1,5 @@
 # 使用官方的 Node 镜像作为基础镜像
-FROM node:latest
+FROM node:18
 
 # 设置工作目录
 WORKDIR /app

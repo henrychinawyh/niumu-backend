@@ -10,6 +10,9 @@ COPY package*.json ./
 # 安装依赖
 RUN npm install
 
+# 安装 PM2
+RUN npm install pm2 -g
+
 # 复制项目文件到工作目录
 COPY . .
 
@@ -17,4 +20,4 @@ COPY . .
 EXPOSE 3000
 
 # 启动应用
-CMD ["npm", "start"]
+CMD ["pm2-runtime", "start", 'src/main.js']

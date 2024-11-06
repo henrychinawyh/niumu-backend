@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 3000
 
 # 启动应用
-CMD ["pm2-runtime", "start", './ecosystem.config.js']
+CMD ["sh", "-c", "pm2-runtime start ./ecosystem.config.js"]

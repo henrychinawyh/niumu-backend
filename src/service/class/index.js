@@ -305,6 +305,8 @@ const queryClassesDetail = async (data) => {
   try {
     const res = await exec(queryClassDetailSql(data));
 
+    console.log(res, "res");
+
     return {
       status: 200,
       data: {

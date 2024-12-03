@@ -9,33 +9,44 @@ const {
   queryTeacherByName,
   getTeacherByClassId,
 } = require("../../controlller/teacher");
+const {
+  TEACHERPREFIX,
+  CREATETEACHER,
+  GETTEACHERLIST,
+  DELETETEACHER,
+  EDITTEACHER,
+  EXPORTTEACHER,
+  QUERYTEACHERWITHCOURSE,
+  QUERYTEACHERBYNAME,
+  GETTEACHERBYCLASSID,
+} = require("./route");
 
 const router = new Router({
-  prefix: "/api/teachers",
+  prefix: TEACHERPREFIX,
 });
 
 // 创建教师
-router.post("/createTeacher", createTeacher);
+router.post(CREATETEACHER, createTeacher);
 
 // 获取教师列表
-router.post("/getTeacherList", getTeacherList);
+router.post(GETTEACHERLIST, getTeacherList);
 
 // 删除教师
-router.post("/deleteTeacher", deleteTeacher);
+router.post(DELETETEACHER, deleteTeacher);
 
 // 编辑教师
-router.post("/editTeacher", editTeacher);
+router.post(EDITTEACHER, editTeacher);
 
 // 导出教师表
-router.post("/exportTeacher", exportTeacher);
+router.post(EXPORTTEACHER, exportTeacher);
 
 // 按照任职课程查询教师
-router.post("/queryTeacherWithCourse", queryTeacherWithCourse);
+router.post(QUERYTEACHERWITHCOURSE, queryTeacherWithCourse);
 
 // 根据输入的教师名查询教师
-router.post("/queryTeacherByName", queryTeacherByName);
+router.post(QUERYTEACHERBYNAME, queryTeacherByName);
 
 // 根据班级id，查询班级的任课教师
-router.post("/getTeacherByClassId", getTeacherByClassId);
+router.post(GETTEACHERBYCLASSID, getTeacherByClassId);
 
 module.exports = router;

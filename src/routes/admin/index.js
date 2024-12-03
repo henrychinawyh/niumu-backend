@@ -14,21 +14,28 @@ const {
 } = require("../../middleware/admin.middleware");
 
 const { auth } = require("../../middleware/auth.middleware");
+const {
+  ADMINSPREFIX,
+  REGISTER,
+  LOGIN,
+  CHANGEPASSWORD,
+  GETCURRENTUSER,
+} = require("./route");
 
 const router = new Router({
-  prefix: "/api/admins",
+  prefix: ADMINSPREFIX,
 });
 
 // 注册接口
-router.post("/register", adminValidator, cryptPassword, verifyAdmin, register);
+router.post(REGISTER, adminValidator, cryptPassword, verifyAdmin, register);
 
 // 登陆接口
-router.post("/login", adminValidator, verifyLogin, login);
+router.post(LOGIN, adminValidator, verifyLogin, login);
 
 // 修改密码
-router.post("/", auth, cryptPassword, changePassword);
+router.post(CHANGEPASSWORD, auth, cryptPassword, changePassword);
 
 // 查询管理员
-router.get("/getCurrentUser", getCurrentUser);
+router.get(GETCURRENTUSER, getCurrentUser);
 
 module.exports = router;

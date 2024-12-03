@@ -1,6 +1,5 @@
-const { toFixed } = require("../../utils");
 const { addPurchaseRecordSql } = require("./sql");
-const { transaction, exec } = require("../../db/seq");
+const { transaction } = require("../../db/seq");
 
 // 给学员新建课时
 const addPurchaseRecord = async (data) => {

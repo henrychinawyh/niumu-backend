@@ -18,44 +18,59 @@ const {
   hasGradeNamesUnderCourse,
   hasCourse,
 } = require("../../middleware/course.middleware");
+const {
+  COURSEPREFIX,
+
+  CREATECOURSE,
+  GETCOURSELIST,
+  GETALLCOURSES,
+  DELETECOURSE,
+  EDITCOURSE,
+  GETCOURSEGRADE,
+  ADDCOURSEGRADE,
+  DELETECOURSEGRADE,
+  EDITCOURSEGRADE,
+  GETALLSUBJECTS,
+  GETCOURSEDETAIL,
+} = require("./route");
 
 // 更新课程的同时，也需要编辑课程的级别
 
 const router = new Router({
-  prefix: "/api/courses",
+  prefix: COURSEPREFIX,
 });
 
 // 新增课程
-router.post("/createCourse", hasCourse, createCourse);
+router.post(CREATECOURSE, hasCourse, createCourse);
 
 // 获取课程列表
-router.post("/getCourseList", getCourseList);
+router.post(GETCOURSELIST, getCourseList);
 
 // 获取所有课程
-router.post("/getAllCourses", getAll);
+router.post(GETALLCOURSES, getAll);
 
 // 删除课程
-router.post("/deleteCourse", deleteCourse);
+router.post(DELETECOURSE, deleteCourse);
 
 // 编辑课程
-router.post("/editCourse", hasCourse, editCourse);
+router.post(EDITCOURSE, hasCourse, editCourse);
 
 // 获取课程的级别
-router.post("/getCourseGrade", getCourseGrade);
+router.post(GETCOURSEGRADE, getCourseGrade);
 
 // 新增课程级别
-router.post("/addCourseGrade", hasGradeNamesUnderCourse, addCourseGrade);
+router.post(ADDCOURSEGRADE, hasGradeNamesUnderCourse, addCourseGrade);
 
 // 删除课程级别
-router.post("/deleteCourseGrade", deleteCourseGrade);
+router.post(DELETECOURSEGRADE, deleteCourseGrade);
 
 // 编辑课程级别
-router.post("/editCourseGrade", hasGradeNameUnderCourse, editCourseGrade);
+router.post(EDITCOURSEGRADE, hasGradeNameUnderCourse, editCourseGrade);
 
 // 查询所有的课程类目
-router.post("/getAllSubjects", queryAllSubjects);
+router.post(GETALLSUBJECTS, queryAllSubjects);
 
 // 查询课程-季度-级别信息
-router.post("/getCourseDetail", getCourseDetail);
+router.post(GETCOURSEDETAIL, getCourseDetail);
 
 module.exports = router;

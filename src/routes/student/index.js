@@ -9,30 +9,40 @@ const {
   getSurplus,
 } = require("../../controlller/student");
 const { checkSameStu } = require("../../middleware/student.middleware");
+const {
+  STUDENTPREFIX,
+  GETSTUDENTLIST,
+  CREATESTUDENT,
+  EDITSTUDENT,
+  DELETESTUDENT,
+  GETSTUDENT,
+  EXPORTSTUDENT,
+  GETSURPLUS,
+} = require("./route");
 
 const router = new Router({
-  prefix: "/api/students",
+  prefix: STUDENTPREFIX,
 });
 
 // 获取学员列表
-router.post("/getStudentList", getStudentList);
+router.post(GETSTUDENTLIST, getStudentList);
 
 // 新建学员
-router.post("/createStudent", checkSameStu, createStudent);
+router.post(CREATESTUDENT, checkSameStu, createStudent);
 
 // 编辑学员
-router.post("/editStudent", editStudent);
+router.post(EDITSTUDENT, editStudent);
 
 // 删除学员
-router.post("/deleteStudent", deleteStudent);
+router.post(DELETESTUDENT, deleteStudent);
 
 // 获取单个学员
-router.post("/getStudent", getStudent);
+router.post(GETSTUDENT, getStudent);
 
 // 导出学生表
-router.post("/exportStudent", exportStudent);
+router.post(EXPORTSTUDENT, exportStudent);
 
 // 查询剩余课销
-router.post("/getSurplus", getSurplus);
+router.post(GETSURPLUS, getSurplus);
 
 module.exports = router;

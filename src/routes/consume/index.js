@@ -8,25 +8,32 @@ const {
   queryStudentConsumeRecord,
   queryFamilyConsumeRecord,
 } = require("../../controlller/consume");
+const {
+  CONSUMEPREFIX,
+  QUERYACCOUNTBALANCE,
+  ADDEXTRACONSUME,
+  QUERYSTUDENTCONSUMERECORD,
+  QUERYFAMILYCONSUMERECORD,
+} = require("./route");
 
 const router = new Router({
-  prefix: "/api/consume",
+  prefix: CONSUMEPREFIX,
 });
 
 // 获取家庭消费
-router.post("/queryAccountBalance", queryAccountBalance);
+router.post(QUERYACCOUNTBALANCE, queryAccountBalance);
 
 // 增加课外消费记录
 router.post(
-  "/addExtraConsume",
+  ADDEXTRACONSUME,
   addExtraConsume,
   queryAccountBalanceBeforeAddRecord,
 );
 
 // 查看学员消费记录
-router.post("/queryStudentConsumeRecord", queryStudentConsumeRecord);
+router.post(QUERYSTUDENTCONSUMERECORD, queryStudentConsumeRecord);
 
 // 查看家庭消费记录
-router.post("/queryFamilyConsumeRecord", queryFamilyConsumeRecord);
+router.post(QUERYFAMILYCONSUMERECORD, queryFamilyConsumeRecord);
 
 module.exports = router;

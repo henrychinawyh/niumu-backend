@@ -7,15 +7,20 @@ const {
   getAttendanceList,
   createAttendance,
 } = require("../../controlller/attendance");
+const {
+  ATTENDANCEPREFIX,
+  GETATTENDANCELIST,
+  CREATEATTENDANCE,
+} = require("./route");
 
 const router = new Router({
-  prefix: "/api/attendance",
+  prefix: ATTENDANCEPREFIX,
 });
 
 // 查询考勤列表
-router.post("/getAttendanceList", getAttendanceList);
+router.post(GETATTENDANCELIST, getAttendanceList);
 
 // 创建一条考勤记录
-router.post("/createAttendance", createAttendance);
+router.post(CREATEATTENDANCE, createAttendance);
 
 module.exports = router;

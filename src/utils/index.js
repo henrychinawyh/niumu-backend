@@ -116,10 +116,31 @@ const responseObject = (data) => {
   return null;
 };
 
+// 获取请求接口的url
+const getRequestUrl = (ctx) => {
+  return ctx.request.url;
+};
+
+// 将查询参数转换为redis中的key
+const convertToRedisKey = (url, params = {}) => {
+  return `${url}-${JSON.stringify(params)}`;
+};
+
+// 返回分页查询标准数据格式
+const formatListData = (arr) => {
+  return {
+    list: arr || [],
+    total: arr?.length || 0,
+  };
+};
+
 module.exports = {
   transformData,
   toFixed,
   removeQuotesFromCalculations,
   getTreeDataByLayer,
   responseObject,
+  getRequestUrl,
+  formatListData,
+  convertToRedisKey,
 };

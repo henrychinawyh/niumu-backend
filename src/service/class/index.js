@@ -22,6 +22,8 @@ const {
 const { addPurchaseRecordSql } = require("../purchase/sql");
 const { delTeacherForClassSql } = require("../teacher/sql");
 const { omit } = require("lodash");
+const { formatListData, convertToRedisKey } = require("../../utils");
+const { setExpire } = require("../../middleware/redis");
 
 /**
  * @name 查询添加的学员是否已在同课程同级别下的班级已存在
@@ -301,18 +303,16 @@ const changeStudentClass = async (data) => {
 };
 
 // 查询班级详情
-const queryClassesDetail = async (data) => {
+const queryClassesDetail = async (url, data) => {
   try {
     const res = await exec(queryClassDetailSql(data));
 
-    console.log(res, "res");
+    // 设置缓存
+    await setExpire(convertToRedisKey(url, data), JSON.stringify(res));
 
     return {
       status: 200,
-      data: {
-        list: res || [],
-        total: res?.length || 0,
-      },
+      data: formatListData(res),
     };
   } catch (err) {
     return {

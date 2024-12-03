@@ -10,6 +10,7 @@ const {
   queryClassesDetail,
   addStudentToClass,
 } = require("../../service/class");
+const { getRequestUrl } = require("../../utils");
 const { commonResult, commonServerWrongResult } = require("../common");
 
 class ClassController {
@@ -99,7 +100,10 @@ class ClassController {
   // 查询班级详情
   async getClassesDetail(ctx, next) {
     try {
-      const res = await queryClassesDetail(ctx.request.body);
+      const res = await queryClassesDetail(
+        getRequestUrl(ctx),
+        ctx.request.body,
+      );
       commonResult(ctx, res);
     } catch (err) {
       commonServerWrongResult(ctx, `学员转班失败：${err}`);

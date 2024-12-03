@@ -19,9 +19,7 @@ const {
 const {
   hasStudentsInSameCourseGrade,
 } = require("../../middleware/studentClass.middleware");
-const {
-  getClassDetailByRedis,
-} = require("../../middleware/redis/classRedis.middleware");
+
 const {
   CREATECLASS,
   GETCLASSLIST,
@@ -70,7 +68,7 @@ router.post(DELETECLASS, hasClass, deleteClass);
 router.post(CHANGECLASS, queryStudentInClassBeforeChangeClass, changeClass);
 
 // 查询班级详情
-router.post(GETCLASSESDETAIL, getClassDetailByRedis, getClassesDetail);
+router.post(GETCLASSESDETAIL, getClassesDetail);
 
 // 给班级增加学员
 router.post(ADDSTUDENTTOCLASS, hasStudentsInSameCourseGrade, addStudent);

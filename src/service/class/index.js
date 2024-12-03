@@ -4,7 +4,6 @@ const { compareArrayWithMin, toUnderline } = require("../../utils/database");
 const {
   addClassSql,
   queryClassSql,
-  queryClassByIdSql,
   queryClassTotalSql,
   addTeacherForClassSql,
   addStudentsForClassSql,
@@ -22,14 +21,7 @@ const {
 const { addPurchaseRecordSql } = require("../purchase/sql");
 const { delTeacherForClassSql } = require("../teacher/sql");
 const { omit } = require("lodash");
-const {
-  formatListData,
-  convertToRedisKey,
-  getKeysByPatternInRedis,
-  deleteRedisByKeys,
-} = require("../../utils");
-const { setExpire } = require("../../middleware/redis");
-const { CLASSPREFIX, GETCLASSESDETAIL } = require("../../routes/class/route");
+const { formatListData } = require("../../utils");
 
 /**
  * @name 查询添加的学员是否已在同课程同级别下的班级已存在
@@ -313,9 +305,6 @@ const queryClassesDetail = async (url, data) => {
   try {
     const res = await exec(queryClassDetailSql(data));
 
-    // 设置缓存
-    await setExpire(convertToRedisKey(url, data), JSON.stringify(res));
-
     return {
       status: 200,
       data: formatListData(res),
@@ -332,12 +321,6 @@ const queryClassesDetail = async (url, data) => {
 const addStudentToClass = async (data) => {
   try {
     await transaction(addStudentToClassSql(data));
-
-    // 班级添加完学员之后需要将清除班级学员缓存
-    const res = await getKeysByPatternInRedis(
-      `${CLASSPREFIX}${GETCLASSESDETAIL}-*`,
-    );
-    await deleteRedisByKeys(res);
 
     return {
       status: 200,

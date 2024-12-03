@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装 PM2
-RUN npm install pm2 -g
+# RUN npm install pm2 -g
 
 # 安装依赖
 RUN npm install
@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 3000
 
 # 启动应用
-CMD ["sh", "-c", "pm2-runtime start ./ecosystem.config.js"]
+CMD ["npm" "run", "start"]

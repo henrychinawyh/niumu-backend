@@ -1,3 +1,4 @@
+const redis = require("../config/redis.default");
 const { SEMESTER } = require("./constant");
 const { compareArrayWithMin } = require("./database");
 
@@ -134,6 +135,28 @@ const formatListData = (arr) => {
   };
 };
 
+// 通过scan扫描获取redis中匹配搭配的键
+const getKeysByPatternInRedis = async (pattern) => {
+  const cacheKeyPattern = pattern;
+  let cursor = "0"; // 游标
+  const allKeys = [];
+
+  do {
+    const result = await redis.scan(cursor, "MATCH", cacheKeyPattern);
+    cursor = result[0];
+
+    const keys = result[1];
+    allKeys.push(...keys);
+  } while (cursor !== "0");
+
+  return allKeys;
+};
+
+// 清理redis中的数据
+const deleteRedisByKeys = async (keys) => {
+  return await redis.del(keys);
+};
+
 module.exports = {
   transformData,
   toFixed,
@@ -142,5 +165,7 @@ module.exports = {
   responseObject,
   getRequestUrl,
   formatListData,
+  getKeysByPatternInRedis,
   convertToRedisKey,
+  deleteRedisByKeys,
 };

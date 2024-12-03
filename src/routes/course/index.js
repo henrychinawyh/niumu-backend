@@ -11,13 +11,13 @@ const {
   queryAllSubjects,
   addCourseGrade,
   getCourseDetail,
-} = require("../controlller/course");
+} = require("../../controlller/course");
 
 const {
   hasGradeNameUnderCourse,
   hasGradeNamesUnderCourse,
   hasCourse,
-} = require("../middleware/course.middleware");
+} = require("../../middleware/course.middleware");
 
 // 更新课程的同时，也需要编辑课程的级别
 

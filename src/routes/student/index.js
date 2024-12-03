@@ -7,8 +7,8 @@ const {
   getStudent,
   exportStudent,
   getSurplus,
-} = require("../controlller/student");
-const { checkSameStu } = require("../middleware/student.middleware");
+} = require("../../controlller/student");
+const { checkSameStu } = require("../../middleware/student.middleware");
 
 const router = new Router({
   prefix: "/api/students",

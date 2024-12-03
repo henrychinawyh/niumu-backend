@@ -8,7 +8,7 @@ const {
   queryList,
   registerMember,
   recharge,
-} = require("../controlller/family");
+} = require("../../controlller/family");
 
 const router = new Router({
   prefix: "/api/family",

@@ -6,7 +6,7 @@ const Router = require("koa-router");
 const {
   getAttendanceList,
   createAttendance,
-} = require("../controlller/attendance");
+} = require("../../controlller/attendance");
 
 const router = new Router({
   prefix: "/api/attendance",

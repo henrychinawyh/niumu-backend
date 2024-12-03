@@ -1,13 +1,13 @@
 const Router = require("koa-router");
 const {
   queryAccountBalanceBeforeAddRecord,
-} = require("../middleware/consume.middleware");
+} = require("../../middleware/consume.middleware");
 const {
   queryAccountBalance,
   addExtraConsume,
   queryStudentConsumeRecord,
   queryFamilyConsumeRecord,
-} = require("../controlller/consume");
+} = require("../../controlller/consume");
 
 const router = new Router({
   prefix: "/api/consume",

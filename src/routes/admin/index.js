@@ -5,15 +5,15 @@ const {
   login,
   changePassword,
   getCurrentUser,
-} = require("../controlller/admin");
+} = require("../../controlller/admin");
 const {
   adminValidator,
   cryptPassword,
   verifyAdmin,
   verifyLogin,
-} = require("../middleware/admin.middleware");
+} = require("../../middleware/admin.middleware");
 
-const { auth } = require("../middleware/auth.middleware");
+const { auth } = require("../../middleware/auth.middleware");
 
 const router = new Router({
   prefix: "/api/admins",

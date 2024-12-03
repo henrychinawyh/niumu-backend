@@ -9,6 +9,12 @@ const addPurchaseRecord = async (data) => {
 
     await transaction(courses.map((item) => addPurchaseRecordSql(item)));
 
+    // 给学员添加完课时之后需要清除班级学员缓存
+    const res = await getKeysByPatternInRedis(
+      `${CLASSPREFIX}${GETCLASSESDETAIL}-*`,
+    );
+    await deleteRedisByKeys(res);
+
     return {
       status: 200,
       data: true,

@@ -8,7 +8,7 @@ const {
   queryTeacherWithCourse,
   queryTeacherByName,
   getTeacherByClassId,
-} = require("../controlller/teacher");
+} = require("../../controlller/teacher");
 
 const router = new Router({
   prefix: "/api/teachers",

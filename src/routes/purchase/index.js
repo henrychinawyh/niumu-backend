@@ -1,5 +1,5 @@
 const Router = require("koa-router");
-const { add } = require("../controlller/purchase");
+const { add } = require("../../controlller/purchase");
 
 const router = new Router({
   prefix: "/api/purchase",

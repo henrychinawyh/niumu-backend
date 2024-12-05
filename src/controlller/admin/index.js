@@ -2,6 +2,7 @@ const { createAdmin, updateById, queryAdmin } = require("../../service/admin");
 const { commonResult } = require("../common");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../config/config.default");
+const { setExpire, get } = require("../../middleware/redis");
 
 class AdminController {
   /**
@@ -27,16 +28,17 @@ class AdminController {
       ctx.cookies.set("username", encodeURIComponent(`${account}`), {
         sameSite: "strict",
       });
-      ctx.cookies.set(
-        "token",
-        encodeURIComponent(
-          `${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`,
-        ),
-        {
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          sameSite: "strict",
-        },
+
+      const token = encodeURIComponent(
+        `${jwt.sign(rest, JWT_SECRET, { expiresIn: "1d" })}`,
       );
+      ctx.cookies.set("token", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        sameSite: "strict",
+      });
+
+      // 将用户信息存入redis
+      setExpire(`admin:${account}`, JSON.stringify(token), 24 * 60 * 60);
 
       commonResult(ctx, {
         message: `欢迎回来, ${admin.account}`,

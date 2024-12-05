@@ -1,6 +1,8 @@
 const { commonResult } = require("../controlller/common");
 const { queryAdmin } = require("../service/admin");
+const jwt = require("jsonwebtoken");
 const bcryptjs = require("bcryptjs");
+const { JWT_SECRET } = require("../config/config.default");
 
 // 验证输入用户名和密码的合法性
 const adminValidator = async (ctx, next) => {
@@ -14,7 +16,6 @@ const adminValidator = async (ctx, next) => {
 
     return;
   }
-
   await next();
 };
 
@@ -48,7 +49,7 @@ const verifyLogin = async (ctx, next) => {
       });
       return;
     } else {
-      if (!bcryptjs.compareSync(password, res[0].password)) {
+      if (!bcryptjs.compareSync(password, res?.[0]?.password)) {
         commonResult(ctx, {
           message: `密码输入错误`,
           status: 500,
@@ -81,9 +82,33 @@ const cryptPassword = async (ctx, next) => {
   await next();
 };
 
+// 验证授权
+const verifyAuth = async (ctx, next) => {
+  const token = ctx.cookies.get("token");
+
+  if (!token) {
+    commonResult(ctx, {
+      status: 401,
+      message: "登录过期，请重新登录",
+    });
+  } else {
+    try {
+      const result = jwt.verify(token, JWT_SECRET);
+      await next();
+    } catch (err) {
+      console.log(err);
+      commonResult(ctx, {
+        status: 401,
+        message: "登录过期，请重新登录",
+      });
+    }
+  }
+};
+
 module.exports = {
   adminValidator,
   verifyAdmin,
   cryptPassword,
   verifyLogin,
+  verifyAuth,
 };

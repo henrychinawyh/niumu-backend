@@ -11,6 +11,7 @@ const {
   cryptPassword,
   verifyAdmin,
   verifyLogin,
+  verifyAuth,
 } = require("../../middleware/admin.middleware");
 
 const { auth } = require("../../middleware/auth.middleware");
@@ -36,6 +37,6 @@ router.post(LOGIN, adminValidator, verifyLogin, login);
 router.post(CHANGEPASSWORD, auth, cryptPassword, changePassword);
 
 // 查询管理员
-router.get(GETCURRENTUSER, getCurrentUser);
+router.get(GETCURRENTUSER, verifyAuth, getCurrentUser);
 
 module.exports = router;

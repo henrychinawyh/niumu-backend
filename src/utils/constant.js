@@ -20,6 +20,7 @@ const TABLENAME = {
   FAMILY: "family",
   FAMILYMEMBER: "family_member",
   FAMILYCOSTRECORD: "family_cost_record",
+  CHATAPIKEY: "chat_api_key",
 };
 
 // 空数据

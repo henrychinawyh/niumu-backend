@@ -74,7 +74,7 @@ const verifyLogin = async (ctx, next) => {
 const cryptPassword = async (ctx, next) => {
   const { password } = ctx.request.body;
 
-  let salt = bcryptjs.genSaltSync(10);
+  let salt = bcryptjs.genSaltSync(10); // 生成一个随机字符串的秘钥，默认经过10轮次加密
   // hash保存的是加密后的password
   let hash = bcryptjs.hashSync(password, salt);
   ctx.request.body.password = hash;

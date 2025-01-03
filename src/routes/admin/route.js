@@ -7,7 +7,6 @@ const GETCURRENTUSER = "/getCurrentUser"; // 查询管理员
 
 module.exports = {
   ADMINSPREFIX,
-
   REGISTER,
   LOGIN,
   CHANGEPASSWORD,

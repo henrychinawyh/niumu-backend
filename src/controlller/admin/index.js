@@ -1,4 +1,9 @@
-const { createAdmin, updateById, queryAdmin } = require("../../service/admin");
+const {
+  createAdmin,
+  updateById,
+  queryAdmin,
+  queryChatApiKey,
+} = require("../../service/admin");
 const { commonResult } = require("../common");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../../config/config.default");
@@ -80,11 +85,16 @@ class AdminController {
     const username = decodeURIComponent(ctx.cookies.get("username"));
 
     try {
-      const res = await queryAdmin(username);
+      const res = await queryAdmin(username); // 查询管理员
+      const apiRes = await queryChatApiKey(); // 查询api-key
+
       const data = res[0];
 
       commonResult(ctx, {
-        data,
+        data: {
+          ...data,
+          apiKey: apiRes?.[1]?.apiKey || "",
+        },
         status: 200,
       });
     } catch (err) {

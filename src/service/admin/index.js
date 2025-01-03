@@ -6,7 +6,7 @@ const createAdmin = async (data) => {
   const { username, password } = data;
   try {
     const res = await exec(
-      sql.table(TABLENAME.ADMIN).data({ account: username, password }).insert()
+      sql.table(TABLENAME.ADMIN).data({ account: username, password }).insert(),
     );
 
     return {
@@ -34,7 +34,7 @@ const queryAdmin = async (data) => {
         .where({
           account: data,
         })
-        .select()
+        .select(),
     );
   }
 
@@ -50,9 +50,15 @@ const updateById = async ({ id, ...rest }) => {
       .where({
         id,
       })
-      .update()
+      .update(),
   );
 
+  return res;
+};
+
+// 查询chat-api-key
+const queryChatApiKey = async () => {
+  const res = await exec(sql.table(TABLENAME.CHATAPIKEY).select());
   return res;
 };
 
@@ -60,4 +66,5 @@ module.exports = {
   createAdmin,
   queryAdmin,
   updateById,
+  queryChatApiKey,
 };
